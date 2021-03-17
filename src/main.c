@@ -6,8 +6,7 @@
 
 int main() {
     TuiInit();
-    struct maze* m = new_maze(TuiRows(), TuiColumns());
-    MazeRead(m);
+    struct maze* m = new_maze("map.txt");
     delete_maze(m);
     TuiExit();
     exit(EXIT_SUCCESS);
