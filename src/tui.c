@@ -18,13 +18,13 @@ void TuiPrintCenter(const char *s) {
     mvprintw(LINES/2, COLS/2 - strlen(s)/2, "%s", s);
 }
 
-void TuiHLine(struct point *p, int length) {
-    move(p->y, p->x);
+void TuiHLine(struct point p, int length) {
+    move(p.y, p.x);
     hline('-', length);
 }
 
-void TuiVLine(struct point *p, int length) {
-    move(p->y, p->x);
+void TuiVLine(struct point p, int length) {
+    move(p.y, p.x);
     vline('|', length);
 }
 
@@ -36,6 +36,6 @@ void TuiExit() {
     exit(EXIT_SUCCESS);
 }
 
-void TuiPrint(struct point *p, int c) {
-    mvaddch(p->y, p->x, c);
+void TuiPrint(struct point p, int c) {
+    mvaddch(p.y, p.x, c);
 }
