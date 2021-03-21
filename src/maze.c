@@ -65,9 +65,24 @@ void MazeReadMap(struct maze* m, FILE* f) {
     do {
         c = fgetc(f);
         switch (c) {
+            case '$':
+                MazeSetTileWhat(m,p,floor,'.',coins);
+                break;
+            case '!':
+                MazeSetTileWhat(m,p,floor,'.',enemy);
+                break;
+            case '?':
+                MazeSetTileWhat(m,p,floor,'.',item);
+                break;
             case '-':
             case '|':
                 MazeSetTile(m, p, wall, c);
+                break;
+            case '/':
+                MazeSetTile(m, p, false_wall, '|');
+                break;
+            case '_':
+                MazeSetTile(m, p, false_wall, '-');
                 break;
             case '\n':
                 p.x = -1;
@@ -107,5 +122,75 @@ struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c)
     if (p.x > m->columns) fatal("set point columns out of bounds");
     m->grid[p.y][p.x]->type = t;
     m->grid[p.y][p.x]->character = c;
+    return m;
+}
+
+struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum Stuff s) {
+    MazeSetTile(m, p, t, c);
+    m->grid[p.y][p.x]->what = s;
+    return m;
+}
+
+struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
+    int x = m->player.x;
+    int y = m->player.y;
+    switch (mv) {
+        case up:
+            if (y == 0) return m;
+            --y;
+            break;
+        case down:
+            if (y == m->rows - 1) return m;
+            ++y;
+            break;
+        case left:
+            if (x == 0) return m;
+            --x;
+            break;
+        case right:
+            if (x == m->columns - 1) return m;
+            ++x;
+            break;
+    }
+    switch (m->grid[y][x]->type) {
+        case false_wall:
+            TuiPrintLineN(m->rows + 2, "Secret passage!");
+            m->player.x = x;
+            m->player.y = y;
+            MazePrintMap(m);
+            break;
+        case floor:
+            switch (m->grid[y][x]->what) {
+                case none:
+                    TuiPrintLineN(m->rows + 2, "               ");
+                    break;
+                case coins:
+                    TuiPrintLineN(m->rows + 2, "You got coins  ");
+                    m->grid[y][x]->what = none;
+                    break;
+                case item:
+                    TuiPrintLineN(m->rows + 2, "You got an item");
+                    m->grid[y][x]->what = none;
+                    break;
+                case enemy:
+                    TuiPrintLineN(m->rows + 2, "An enemy attack");
+                    break;
+            }
+            m->player.x = x;
+            m->player.y = y;
+            MazePrintMap(m);
+            break;
+        case pit:
+            // TODO should die
+            TuiPrintLineN(m->rows + 2, "               ");
+            m->player.x = x;
+            m->player.y = y;
+            MazePrintMap(m);
+            break;
+        case wall:
+            // flash or bell
+            TuiPrintLineN(m->rows + 2, "Ouch           ");
+            break;
+    }
     return m;
 }

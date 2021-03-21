@@ -8,6 +8,10 @@
 int TuiColumns() { return COLS; }
 int TuiRows() { return LINES; }
 
+int TuiInput() {
+    return getch();
+}
+
 void TuiInit() {
     initscr();
     curs_set(false);
@@ -16,6 +20,10 @@ void TuiInit() {
 
 void TuiPrintCenter(const char *s) {
     mvprintw(LINES/2, COLS/2 - strlen(s)/2, "%s", s);
+}
+
+void TuiPrintLineN(int n, const char *s) {
+    mvprintw(n, 0, "%s", s);
 }
 
 void TuiHLine(struct point p, int length) {
