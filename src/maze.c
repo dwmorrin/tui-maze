@@ -131,6 +131,10 @@ struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, in
     return m;
 }
 
+void MazeMessage(struct maze* m, const char* s) {
+    TuiPrintLineN(m->rows + 2, s);
+}
+
 struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
     int x = m->player.x;
     int y = m->player.y;
@@ -154,7 +158,7 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
     }
     switch (m->grid[y][x]->type) {
         case false_wall:
-            TuiPrintLineN(m->rows + 2, "Secret passage!");
+            MazeMessage(m, "Secret passage!");
             m->player.x = x;
             m->player.y = y;
             MazePrintMap(m);
@@ -162,18 +166,18 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
         case floor:
             switch (m->grid[y][x]->what) {
                 case none:
-                    TuiPrintLineN(m->rows + 2, "               ");
+                    MazeMessage(m, "               ");
                     break;
                 case coins:
-                    TuiPrintLineN(m->rows + 2, "You got coins  ");
+                    MazeMessage(m, "You got coins  ");
                     m->grid[y][x]->what = none;
                     break;
                 case item:
-                    TuiPrintLineN(m->rows + 2, "You got an item");
+                    MazeMessage(m, "You got an item");
                     m->grid[y][x]->what = none;
                     break;
                 case enemy:
-                    TuiPrintLineN(m->rows + 2, "An enemy attack");
+                    MazeMessage(m, "An enemy attack");
                     break;
             }
             m->player.x = x;
@@ -182,14 +186,14 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
             break;
         case pit:
             // TODO should die
-            TuiPrintLineN(m->rows + 2, "               ");
+            MazeMessage(m, "               ");
             m->player.x = x;
             m->player.y = y;
             MazePrintMap(m);
             break;
         case wall:
             // flash or bell
-            TuiPrintLineN(m->rows + 2, "Ouch           ");
+            MazeMessage(m, "Ouch           ");
             break;
     }
     return m;
