@@ -7,14 +7,43 @@
 #include "tile.h"
 #include "tui.h"
 
+enum items *new_inventory() {
+    enum items *inv = malloc(sizeof(enum items) * INVENTORY_SIZE);
+    if (!inv) fatal("no memory for a new inventory");
+    for (int i = 0; i < INVENTORY_SIZE; ++i)
+        inv[i] = noitem;
+    return inv;
+}
+
 struct maze* new_maze(const char* filename) {
-    struct maze *m = malloc(sizeof(struct maze*));
+    struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
+
+    // inventory
+    m->inventory = new_inventory();
+
+    // counters
     m->player.x = 0;
     m->player.y = 0;
+    m->coins = 0;
+
+    // read map of maze
     FILE *f = fopen(filename, "r");
     if (!f) fatal("could not open maze file");
-    init_maze_grid(init_maze_dimensions(m, f));
+    init_maze_dimensions(m, f);
+    if (!m->rows) fatal("map has no rows");
+    if (!m->columns) fatal("map has no columns");
+    m->grid = malloc(m->rows * sizeof(struct tile**));
+    if (!m->grid) fatal("no memory for maze grid");
+    // init grid
+    for (int i = 0; i < m->rows; ++i) {
+        m->grid[i] = malloc(m->columns * sizeof(struct tile*));
+        if (!m->grid[i]) fatal("no memory for maze grid");
+        for (int j = 0; j < m->columns; ++j) {
+            m->grid[i][j] = new_tile();
+            if (!m->grid[i][j]) fatal("no memory for new tile");
+        }
+    }
     rewind(f);
     MazeReadMap(m, f);
     fclose(f);
@@ -36,20 +65,6 @@ struct maze* init_maze_dimensions(struct maze* m, FILE* f) {
     } while (c != EOF);
     m->columns = colsMax;
     m->rows = rows;
-    return m;
-}
-
-struct maze* init_maze_grid(struct maze* m) {
-    m->grid = malloc(m->rows * sizeof(struct tile***));
-    if (!m->grid) fatal("no memory for maze grid");
-    for (int i = 0; i < m->rows; ++i) {
-        m->grid[i] = malloc(m->columns * sizeof(struct tile**));
-        if (!m->grid) fatal("no memory for maze grid");
-        for (int j = 0; j < m->columns; ++j) {
-            m->grid[i][j] = new_tile();
-            if (!m->grid[i][j]) fatal("no memory for new tile");
-        }
-    }
     return m;
 }
 
@@ -99,6 +114,17 @@ void MazeReadMap(struct maze* m, FILE* f) {
     } while (c != EOF && p.y < m->rows);
 }
 
+void MazePrintInventory(struct maze* m) {
+    struct point p = {0, m->rows +1};
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
+        TuiPrint(p, '|');
+        ++p.x;
+        TuiPrint(p, m->inventory[i] == noitem ? ' ' : 'x');
+        ++p.x;
+    }
+    TuiPrint(p, '|');
+}
+
 void MazePrintMap(struct maze* m) {
     struct point p = {0,0};
     for (; p.y < m->rows; ++p.y)
@@ -109,6 +135,7 @@ void MazePrintMap(struct maze* m) {
                     p.y == m->player.y
                       ? PLAYER_CHAR
                       : m->grid[p.y][p.x]->character);
+    MazePrintInventory(m);
 }
 
 struct maze* MazeSetPlayer(struct maze* m, struct point p) {

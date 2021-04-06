@@ -13,17 +13,29 @@ enum move {
     up = 'w'
 };
 
+#define INVENTORY_SIZE 16
+enum items {
+    noitem,
+    sword,
+    shield,
+    armor,
+    food
+};
+
 struct maze {
-    struct tile ***grid;
     int rows;
     int columns;
     struct point player;
+    int coins;
+    enum items *inventory;
+    struct tile ***grid;
 };
 
 struct maze* new_maze(const char*);
 void delete_maze(struct maze*);
 struct maze* init_maze_dimensions(struct maze*, FILE*);
 struct maze* init_maze_grid(struct maze*);
+void MazeMessage(struct maze* m, const char*);
 struct maze* MazePlayerMove(struct maze*, enum move);
 void MazePrintMap(struct maze*);
 void MazeReadMap(struct maze*, FILE*);

@@ -6,7 +6,7 @@ objDir = obj
 src = $(wildcard $(srcDir)/*.c)
 objs = $(src:$(srcDir)/%.c=$(objDir)/%.o)
 
-CPPFLAGS += -Iinclude
+CPPFLAGS += -Iinclude -g
 CFLAGS += -Wall
 LDLIBS += -lncurses
 
