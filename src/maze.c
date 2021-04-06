@@ -94,7 +94,7 @@ void MazeReadMap(struct maze* m, FILE* f) {
                 MazeSetTileWhat(m,p,floor,'.',coins);
                 break;
             case '!':
-                MazeSetTileWhat(m,p,floor,'.',enemy);
+                MazeSetTileWhat(m,p,floor,'!',enemy);
                 break;
             case '?':
                 MazeSetTileWhat(m,p,floor,'.',item);
@@ -198,40 +198,43 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
             MazeMessage(m, "Secret passage!");
             m->player.x = x;
             m->player.y = y;
-            MazePrintMap(m);
             break;
         case floor:
             switch (m->grid[y][x]->what) {
                 case none:
                     MazeMessage(m, "               ");
+                    m->player.x = x;
+                    m->player.y = y;
                     break;
                 case coins:
                     MazeMessage(m, "You got coins  ");
                     m->grid[y][x]->what = none;
+                    m->player.x = x;
+                    m->player.y = y;
                     break;
                 case item:
                     MazeMessage(m, "You got an item");
                     m->grid[y][x]->what = none;
+                    m->player.x = x;
+                    m->player.y = y;
                     break;
                 case enemy:
                     MazeMessage(m, "An enemy attack");
+                    // roll dice; if defeated move; else stay
                     break;
             }
-            m->player.x = x;
-            m->player.y = y;
-            MazePrintMap(m);
             break;
         case pit:
             // TODO should die
             MazeMessage(m, "               ");
             m->player.x = x;
             m->player.y = y;
-            MazePrintMap(m);
             break;
         case wall:
             // flash or bell
             MazeMessage(m, "Ouch           ");
             break;
     }
+    MazePrintMap(m);
     return m;
 }
