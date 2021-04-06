@@ -15,6 +15,21 @@ enum items *new_inventory() {
     return inv;
 }
 
+struct tile ***new_grid(struct maze *m) {
+    struct tile ***g = malloc(m->rows * sizeof(struct tile**));
+    if (!g) fatal("no memory for maze grid");
+    // init grid
+    for (int i = 0; i < m->rows; ++i) {
+        g[i] = malloc(m->columns * sizeof(struct tile*));
+        if (!g[i]) fatal("no memory for maze grid");
+        for (int j = 0; j < m->columns; ++j) {
+            g[i][j] = new_tile();
+            if (!g[i][j]) fatal("no memory for new tile");
+        }
+    }
+    return g;
+}
+
 struct maze* new_maze(const char* filename) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
@@ -27,24 +42,19 @@ struct maze* new_maze(const char* filename) {
     m->player.y = 0;
     m->coins = 0;
 
-    // read map of maze
+    // read file once to get dimensions
     FILE *f = fopen(filename, "r");
     if (!f) fatal("could not open maze file");
     init_maze_dimensions(m, f);
     if (!m->rows) fatal("map has no rows");
     if (!m->columns) fatal("map has no columns");
-    m->grid = malloc(m->rows * sizeof(struct tile**));
+
+    // initialize maze internal grid
+    m->grid = new_grid(m);
     if (!m->grid) fatal("no memory for maze grid");
-    // init grid
-    for (int i = 0; i < m->rows; ++i) {
-        m->grid[i] = malloc(m->columns * sizeof(struct tile*));
-        if (!m->grid[i]) fatal("no memory for maze grid");
-        for (int j = 0; j < m->columns; ++j) {
-            m->grid[i][j] = new_tile();
-            if (!m->grid[i][j]) fatal("no memory for new tile");
-        }
-    }
     rewind(f);
+
+    // read file again to get details into grid
     MazeReadMap(m, f);
     fclose(f);
     return m;
