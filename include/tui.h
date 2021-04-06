@@ -5,7 +5,7 @@
 
 int TuiColumns();
 void TuiExit();
-void TuiHLine(struct point, int);
+void TuiHLine(struct point, int, int);
 void TuiInit();
 int TuiInput();
 void TuiPrintCenter(const char*);

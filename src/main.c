@@ -1,10 +1,12 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "maze.h"
 #include "point.h"
 #include "tui.h"
 
 int main() {
+    srand(time(NULL)); // initialize PRNG for rolling dice
     TuiInit();
     struct maze* m = new_maze("map.txt");
     MazePrintMap(m);

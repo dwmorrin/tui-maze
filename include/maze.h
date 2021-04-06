@@ -43,5 +43,5 @@ struct maze* MazeSetTile(struct maze*, struct point, enum TileType, int);
 struct maze* MazeSetTileWhat(struct maze*, struct point, enum TileType, int, enum Stuff);
 struct maze* MazeSetPlayer(struct maze*, struct point);
 struct maze* MazeMovePlayer(struct maze*, enum move);
-
+int items_token(enum items);
 #endif

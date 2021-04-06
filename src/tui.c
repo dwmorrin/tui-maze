@@ -26,9 +26,9 @@ void TuiPrintLineN(int n, const char *s) {
     mvprintw(n, 0, "%s", s);
 }
 
-void TuiHLine(struct point p, int length) {
+void TuiHLine(struct point p, int c, int length) {
     move(p.y, p.x);
-    hline('-', length);
+    hline(c, length);
 }
 
 void TuiVLine(struct point p, int length) {

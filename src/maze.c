@@ -7,6 +7,10 @@
 #include "tile.h"
 #include "tui.h"
 
+int roll_die(int sides) {
+    return (rand() % sides) + 1;
+}
+
 enum items *new_inventory() {
     enum items *inv = malloc(sizeof(enum items) * INVENTORY_SIZE);
     if (!inv) fatal("no memory for a new inventory");
@@ -129,7 +133,7 @@ void MazePrintInventory(struct maze* m) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         TuiPrint(p, '|');
         ++p.x;
-        TuiPrint(p, m->inventory[i] == noitem ? ' ' : 'x');
+        TuiPrint(p, items_token(m->inventory[i]));
         ++p.x;
     }
     TuiPrint(p, '|');
@@ -169,7 +173,21 @@ struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, in
 }
 
 void MazeMessage(struct maze* m, const char* s) {
-    TuiPrintLineN(m->rows + 2, s);
+    struct point p = {0, m->rows + 2};
+    TuiHLine(p, ' ', TuiColumns());
+    TuiPrintLineN(p.y, s);
+}
+
+// returns index of item or -1 if inventory full
+int MazeAddItem(struct maze *m, enum items it) {
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
+        if (m->inventory[i] == noitem) {
+            m->inventory[i] = it;
+            MazePrintInventory(m);
+            return i;
+        }
+    }
+    return -1;
 }
 
 struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
@@ -202,39 +220,82 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
         case floor:
             switch (m->grid[y][x]->what) {
                 case none:
-                    MazeMessage(m, "               ");
+                    MazeMessage(m, "");
                     m->player.x = x;
                     m->player.y = y;
                     break;
                 case coins:
-                    MazeMessage(m, "You got coins  ");
+                    MazeMessage(m, "You got coins");
                     m->grid[y][x]->what = none;
                     m->player.x = x;
                     m->player.y = y;
                     break;
-                case item:
-                    MazeMessage(m, "You got an item");
-                    m->grid[y][x]->what = none;
+                case item: {
                     m->player.x = x;
                     m->player.y = y;
+                    int i = MazeAddItem(m, sword);
+                    if (i < 0) {
+                        MazeMessage(
+                            m,
+                            "You found an item but "
+                            "your inventory is full."
+                        );
+                    } else {
+                        m->grid[y][x]->what = none;
+                        MazeMessage(m, "You got an item");
+                    }
                     break;
-                case enemy:
-                    MazeMessage(m, "An enemy attack");
+                }
+                case enemy: {
                     // roll dice; if defeated move; else stay
+                    char msg[80];
+                    int attack = roll_die(10);
+                    int defend = roll_die(10);
+                    int won = defend > attack;
+                    sprintf(
+                        msg,
+                        "Enemy! you roll %d, they roll %d, you %s",
+                        defend,
+                        attack,
+                        won ? "won" : "lost"
+                    );
+                    MazeMessage(m, msg);
+                    if (won) {
+                        m->grid[y][x]->what = none;
+                        m->grid[y][x]->character = '.';
+                        m->player.x = x;
+                        m->player.y = y;
+                    }
                     break;
+                }
             }
             break;
         case pit:
             // TODO should die
-            MazeMessage(m, "               ");
+            MazeMessage(m, "");
             m->player.x = x;
             m->player.y = y;
             break;
         case wall:
             // flash or bell
-            MazeMessage(m, "Ouch           ");
+            MazeMessage(m, "Ouch");
             break;
     }
     MazePrintMap(m);
     return m;
+}
+
+int items_token(enum items i) {
+    switch (i) {
+        case noitem:
+            return ' ';
+        case sword:
+            return '/';
+        case shield:
+            return '0';
+        case armor:
+            return 'T';
+        case food:
+            return '*';
+    }
 }
