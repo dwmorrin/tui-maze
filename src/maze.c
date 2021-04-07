@@ -216,24 +216,25 @@ int MazeAddItem(struct maze *m, enum items it) {
     return -1;
 }
 
-struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
+// return 'q' to kill game
+int MazeMovePlayer(struct maze* m, enum move mv) {
     int x = m->player->p.x;
     int y = m->player->p.y;
     switch (mv) {
         case up:
-            if (y == 0) return m;
+            if (y == 0) return mv;
             --y;
             break;
         case down:
-            if (y == m->rows - 1) return m;
+            if (y == m->rows - 1) return mv;
             ++y;
             break;
         case left:
-            if (x == 0) return m;
+            if (x == 0) return mv;
             --x;
             break;
         case right:
-            if (x == m->columns - 1) return m;
+            if (x == m->columns - 1) return mv;
             ++x;
             break;
     }
@@ -277,8 +278,13 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
                     // roll dice; if defeated move; else stay
                     char msg[80];
                     int attack = roll_die(e->attack);
-                    int defend = roll_die(10);
+                    int defend = roll_die(m->player->attack);
                     e->hp -= defend;
+                    m->player->hp -= attack;
+                    if (m->player->hp <= 0) {
+                        MazeMessage(m, "you died!");
+                        return 'q';
+                    }
                     int won = e->hp <= 0;
                     sprintf(
                         msg,
@@ -309,18 +315,17 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
             }
             break;
         case pit:
-            // TODO should die
-            MazeMessage(m, "");
+            MazeMessage(m, "you died");
             m->player->p.x = x;
             m->player->p.y = y;
-            break;
+            return 'q';
         case wall:
             // flash or bell
             MazeMessage(m, "Ouch");
             break;
     }
     MazePrintMap(m);
-    return m;
+    return mv;
 }
 
 int items_token(enum items i) {

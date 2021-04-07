@@ -18,7 +18,7 @@ int main() {
             case down:
             case left:
             case right:
-                MazeMovePlayer(m, c);
+                c = MazeMovePlayer(m, c);
         }
     }
     delete_maze(m);
