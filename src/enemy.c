@@ -10,6 +10,9 @@ struct enemy *new_enemy(int character) {
     e->attack = 1;
     e->damage = 0;
     e->defense = 1;
+    e->coins = 0;
     e->item = food;
+    e->p.x = 0;
+    e->p.y = 0;
     return e;
 }

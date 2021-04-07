@@ -54,10 +54,7 @@ struct maze* new_maze(const char* filename) {
     // inventory
     m->inventory = new_inventory();
 
-    // counters
-    m->player.x = 0;
-    m->player.y = 0;
-    m->coins = 0;
+    m->player = new_enemy('@');
 
     // read file once to get dimensions
     FILE *f = fopen(filename, "r");
@@ -167,16 +164,16 @@ void MazePrintMap(struct maze* m) {
         for (p.x = 0; p.x < m->columns; ++p.x)
             TuiPrint(
                     p,
-                    p.x == m->player.x &&
-                    p.y == m->player.y
+                    p.x == m->player->p.x &&
+                    p.y == m->player->p.y
                       ? PLAYER_CHAR
                       : m->grid[p.y][p.x]->character);
     MazePrintInventory(m);
 }
 
 struct maze* MazeSetPlayer(struct maze* m, struct point p) {
-    m->player.x = p.x;
-    m->player.y = p.y;
+    m->player->p.x = p.x;
+    m->player->p.y = p.y;
     return m;
 }
 
@@ -220,8 +217,8 @@ int MazeAddItem(struct maze *m, enum items it) {
 }
 
 struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
-    int x = m->player.x;
-    int y = m->player.y;
+    int x = m->player->p.x;
+    int y = m->player->p.y;
     switch (mv) {
         case up:
             if (y == 0) return m;
@@ -243,25 +240,25 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
     switch (m->grid[y][x]->type) {
         case false_wall:
             MazeMessage(m, "Secret passage!");
-            m->player.x = x;
-            m->player.y = y;
+            m->player->p.x = x;
+            m->player->p.y = y;
             break;
         case floor:
             switch (m->grid[y][x]->what) {
                 case none:
                     MazeMessage(m, "");
-                    m->player.x = x;
-                    m->player.y = y;
+                    m->player->p.x = x;
+                    m->player->p.y = y;
                     break;
                 case coins:
                     MazeMessage(m, "You got coins");
                     m->grid[y][x]->what = none;
-                    m->player.x = x;
-                    m->player.y = y;
+                    m->player->p.x = x;
+                    m->player->p.y = y;
                     break;
                 case item: {
-                    m->player.x = x;
-                    m->player.y = y;
+                    m->player->p.x = x;
+                    m->player->p.y = y;
                     int i = MazeAddItem(m, sword);
                     if (i < 0) {
                         MazeMessage(
@@ -304,8 +301,8 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
                         }
                         m->grid[y][x]->what = none;
                         m->grid[y][x]->character = '.';
-                        m->player.x = x;
-                        m->player.y = y;
+                        m->player->p.x = x;
+                        m->player->p.y = y;
                     }
                     break;
                 }
@@ -314,8 +311,8 @@ struct maze* MazeMovePlayer(struct maze* m, enum move mv) {
         case pit:
             // TODO should die
             MazeMessage(m, "");
-            m->player.x = x;
-            m->player.y = y;
+            m->player->p.x = x;
+            m->player->p.y = y;
             break;
         case wall:
             // flash or bell

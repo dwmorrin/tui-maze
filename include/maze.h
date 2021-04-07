@@ -22,7 +22,7 @@ enum move {
 struct maze {
     int rows;
     int columns;
-    struct point player;
+    struct enemy *player;
     int coins;
     int nextEnemy;
     enum items *inventory;

@@ -2,6 +2,7 @@
 #define ENEMY
 
 #include "items.h"
+#include "point.h"
 
 #define MOBLIN 'm'
 #define BIG_MOBLIN 'M'
@@ -16,7 +17,9 @@ struct enemy {
     int attack;
     int damage;
     int defense;
+    int coins;
     enum items item;
+    struct point p;
 };
 
 struct enemy *new_enemy(int character);
