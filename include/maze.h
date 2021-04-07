@@ -5,6 +5,8 @@
 
 #include "point.h"
 #include "tile.h"
+#include "enemy.h"
+#include "items.h"
 
 enum move {
     left = 'a',
@@ -13,14 +15,9 @@ enum move {
     up = 'w'
 };
 
+#define ENEMIES_SIZE 64
+
 #define INVENTORY_SIZE 16
-enum items {
-    noitem,
-    sword,
-    shield,
-    armor,
-    food
-};
 
 struct maze {
     int rows;
@@ -28,6 +25,7 @@ struct maze {
     struct point player;
     int coins;
     enum items *inventory;
+    struct enemy **enemies;
     struct tile ***grid;
 };
 

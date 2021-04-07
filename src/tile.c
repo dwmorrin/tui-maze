@@ -7,6 +7,7 @@ struct tile* new_tile() {
     t->type = pit;
     t->character = ' ';
     t->what = none;
+    t->enemy_ref = NULL;
     return t;
 }
 

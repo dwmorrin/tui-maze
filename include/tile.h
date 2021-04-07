@@ -21,6 +21,7 @@ struct tile {
     enum TileType type;
     int character;
     enum Stuff what;
+    struct enemy *enemy_ref;
 };
 
 void delete_tile(struct tile*);

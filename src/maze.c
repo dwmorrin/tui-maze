@@ -6,6 +6,7 @@
 #include "point.h"
 #include "tile.h"
 #include "tui.h"
+#include "enemy.h"
 
 int roll_die(int sides) {
     return (rand() % sides) + 1;
@@ -34,9 +35,20 @@ struct tile ***new_grid(struct maze *m) {
     return g;
 }
 
+struct enemy **new_enemies() {
+    struct enemy **e = malloc(ENEMIES_SIZE * sizeof(struct enemy*));
+    for (int i = 0; i < ENEMIES_SIZE; ++i) {
+        e[i] = new_enemy();
+    }
+    return e;
+}
+
 struct maze* new_maze(const char* filename) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
+
+    // enemy list
+    m->enemies = new_enemies();
 
     // inventory
     m->inventory = new_inventory();
