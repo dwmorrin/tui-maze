@@ -4,6 +4,7 @@
 #include "items.h"
 
 struct enemy {
+    int character;
     int hp;
     int attack;
     int damage;

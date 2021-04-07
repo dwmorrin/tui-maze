@@ -24,6 +24,7 @@ struct maze {
     int columns;
     struct point player;
     int coins;
+    int nextEnemy;
     enum items *inventory;
     struct enemy **enemies;
     struct tile ***grid;
@@ -39,6 +40,7 @@ void MazePrintMap(struct maze*);
 void MazeReadMap(struct maze*, FILE*);
 struct maze* MazeSetTile(struct maze*, struct point, enum TileType, int);
 struct maze* MazeSetTileWhat(struct maze*, struct point, enum TileType, int, enum Stuff);
+struct maze* MazeSetTileEnemy(struct maze*, struct point, enum TileType, struct enemy*);
 struct maze* MazeSetPlayer(struct maze*, struct point);
 struct maze* MazeMovePlayer(struct maze*, enum move);
 int items_token(enum items);

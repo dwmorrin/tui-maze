@@ -48,6 +48,7 @@ struct maze* new_maze(const char* filename) {
     if (!m) fatal("no memory for a new maze");
 
     // enemy list
+    m->nextEnemy = 0;
     m->enemies = new_enemies();
 
     // inventory
@@ -110,7 +111,11 @@ void MazeReadMap(struct maze* m, FILE* f) {
                 MazeSetTileWhat(m,p,floor,'.',coins);
                 break;
             case '!':
-                MazeSetTileWhat(m,p,floor,'!',enemy);
+                //TODO refactor into an ``enemy push'' fn
+                if (m->nextEnemy == ENEMIES_SIZE) exit(EXIT_FAILURE);
+                m->enemies[m->nextEnemy] = new_enemy();
+                MazeSetTileEnemy(m,p,floor,m->enemies[m->nextEnemy]);
+                ++m->nextEnemy;
                 break;
             case '?':
                 MazeSetTileWhat(m,p,floor,'.',item);
@@ -181,6 +186,13 @@ struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c)
 struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum Stuff s) {
     MazeSetTile(m, p, t, c);
     m->grid[p.y][p.x]->what = s;
+    return m;
+}
+
+struct maze* MazeSetTileEnemy(struct maze* m, struct point p, enum TileType t, struct enemy *e) {
+    MazeSetTile(m, p, t, e->character);
+    m->grid[p.y][p.x]->what = enemy;
+    m->grid[p.y][p.x]->enemy_ref = e;
     return m;
 }
 

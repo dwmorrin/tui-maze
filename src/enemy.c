@@ -5,6 +5,7 @@
 
 struct enemy *new_enemy() {
     struct enemy *e = malloc(sizeof(struct enemy));
+    e->character = 'm';
     e->hp = 10;
     e->attack = 1;
     e->damage = 0;
