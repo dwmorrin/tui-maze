@@ -38,7 +38,7 @@ struct tile ***new_grid(struct maze *m) {
 struct enemy **new_enemies() {
     struct enemy **e = malloc(ENEMIES_SIZE * sizeof(struct enemy*));
     for (int i = 0; i < ENEMIES_SIZE; ++i) {
-        e[i] = new_enemy();
+        e[i] = new_enemy('!');
     }
     return e;
 }
@@ -110,10 +110,15 @@ void MazeReadMap(struct maze* m, FILE* f) {
             case '$':
                 MazeSetTileWhat(m,p,floor,'.',coins);
                 break;
-            case '!':
+            case MOBLIN:
+            case BIG_MOBLIN:
+            case GOBLIN:
+            case BIG_GOBLIN:
+            case BAT:
+            case BIG_BAT:
                 //TODO refactor into an ``enemy push'' fn
                 if (m->nextEnemy == ENEMIES_SIZE) exit(EXIT_FAILURE);
-                m->enemies[m->nextEnemy] = new_enemy();
+                m->enemies[m->nextEnemy] = new_enemy(c);
                 MazeSetTileEnemy(m,p,floor,m->enemies[m->nextEnemy]);
                 ++m->nextEnemy;
                 break;

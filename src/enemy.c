@@ -3,9 +3,9 @@
 #include "enemy.h"
 #include "items.h"
 
-struct enemy *new_enemy() {
+struct enemy *new_enemy(int character) {
     struct enemy *e = malloc(sizeof(struct enemy));
-    e->character = 'm';
+    e->character = character;
     e->hp = 10;
     e->attack = 1;
     e->damage = 0;
