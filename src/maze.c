@@ -169,6 +169,7 @@ void MazePrintMap(struct maze* m) {
                       ? PLAYER_CHAR
                       : m->grid[p.y][p.x]->character);
     MazePrintInventory(m);
+    MazeStats(m);
 }
 
 struct maze* MazeSetPlayer(struct maze* m, struct point p) {
@@ -204,6 +205,20 @@ void MazeMessage(struct maze* m, const char* s) {
     TuiPrintLineN(p.y, s);
 }
 
+void MazeStats(struct maze* m) {
+    struct point p = {0, m->rows + 4};
+    TuiHLine(p, ' ', TuiColumns());
+    char stats[80];
+    sprintf(
+        stats,
+        "Health: %d, Attack: %d",
+        m->player->hp,
+        m->player->attack
+    );
+    TuiPrintLineN(p.y, stats);
+}
+
+
 // returns index of item or -1 if inventory full
 int MazeAddItem(struct maze *m, enum items it) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
@@ -214,6 +229,16 @@ int MazeAddItem(struct maze *m, enum items it) {
         }
     }
     return -1;
+}
+
+void MazePlayerItemEffect(struct maze *m, enum items it) {
+    switch (it) {
+        case sword:
+            m->player->attack += 3;
+            break;
+        default:
+            break;
+    }
 }
 
 // return 'q' to kill game
@@ -268,6 +293,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                             "your inventory is full."
                         );
                     } else {
+                        MazePlayerItemEffect(m, sword);
                         m->grid[y][x]->what = none;
                         MazeMessage(m, "You got an item");
                     }
@@ -341,4 +367,22 @@ int items_token(enum items i) {
         case food:
             return '*';
     }
+}
+
+int MazePlayerEat(struct maze *m, int mv) {
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
+        if (m->inventory[i] == food) {
+            if (m->player->hp >= 10) {
+                MazeMessage(m, "you are not hungry");
+                return mv;
+            }
+            m->inventory[i] = noitem;
+            m->player->hp += 1;
+            MazePrintMap(m);
+            MazeMessage(m, "yum");
+            return mv;
+        }
+    }
+    MazeMessage(m, "you have no food");
+    return mv;
 }

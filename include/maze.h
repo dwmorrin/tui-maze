@@ -15,6 +15,10 @@ enum move {
     up = 'w'
 };
 
+enum action {
+    eat = 'e'
+};
+
 #define ENEMIES_SIZE 64
 
 #define INVENTORY_SIZE 16
@@ -44,4 +48,6 @@ struct maze* MazeSetTileEnemy(struct maze*, struct point, enum TileType, struct 
 struct maze* MazeSetPlayer(struct maze*, struct point);
 int MazeMovePlayer(struct maze*, enum move);
 int items_token(enum items);
+void MazeStats(struct maze* m);
+int MazePlayerEat(struct maze *, int);
 #endif

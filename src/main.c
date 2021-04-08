@@ -19,6 +19,10 @@ int main() {
             case left:
             case right:
                 c = MazeMovePlayer(m, c);
+                break;
+            case eat:
+                c = MazePlayerEat(m, c);
+                break;
         }
     }
     delete_maze(m);
