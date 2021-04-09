@@ -50,4 +50,5 @@ int MazeMovePlayer(struct maze*, enum move);
 int items_token(enum items);
 void MazeStats(struct maze* m);
 int MazePlayerEat(struct maze *, int);
+int MazeBattle(struct maze *, int, int, int);
 #endif

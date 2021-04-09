@@ -299,49 +299,10 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                     }
                     break;
                 }
-                case enemy: {
-                    struct enemy *e = m->grid[y][x]->enemy_ref;
-                    // roll dice; if defeated move; else stay
-                    char msg[80];
-                    int attack = roll_die(e->attack);
-                    int defend = roll_die(m->player->attack);
-                    e->hp -= defend;
-                    m->player->hp -= attack;
-                    if (m->player->hp <= 0) {
-                        MazeMessage(m, "you died!");
-                        return 'q';
-                    }
-                    int won = e->hp <= 0;
-                    char *name = enemy_name(e);
-                    sprintf(
-                        msg,
-                        "%s! you roll %d, they roll %d, they have %d health, you %s",
-                        name,
-                        defend,
-                        attack,
-                        e->hp,
-                        won ? "won" : "do some damage"
-                    );
-                    MazeMessage(m, msg);
-                    free(name);
-                    if (won) {
-                        int i = MazeAddItem(m, e->item);
-                        if (i < 0) {
-                            MazeMessage(
-                                m,
-                                "You found an item but "
-                                "your inventory is full."
-                            );
-                        } else {
-                            MazeMessage(m, "You got an item");
-                        }
-                        m->grid[y][x]->what = none;
-                        m->grid[y][x]->character = '.';
-                        m->player->p.x = x;
-                        m->player->p.y = y;
-                    }
+                case enemy:
+                    mv = MazeBattle(m, x, y, mv);
+                    if (mv == 'q') return mv;
                     break;
-                }
             }
             break;
         case pit:
@@ -355,6 +316,50 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
             break;
     }
     MazePrintMap(m);
+    return mv;
+}
+
+int MazeBattle(struct maze *m, int x, int y, int mv) {
+    struct enemy *e = m->grid[y][x]->enemy_ref;
+    // roll dice; if defeated move; else stay
+    char msg[80];
+    int attack = roll_die(e->attack);
+    int defend = roll_die(m->player->attack);
+    e->hp -= defend;
+    m->player->hp -= attack;
+    if (m->player->hp <= 0) {
+        MazeMessage(m, "you died!");
+        return 'q';
+    }
+    int won = e->hp <= 0;
+    char *name = enemy_name(e);
+    sprintf(
+        msg,
+        "%s! you roll %d, they roll %d, they have %d health, you %s",
+        name,
+        defend,
+        attack,
+        e->hp,
+        won ? "won" : "do some damage"
+    );
+    MazeMessage(m, msg);
+    free(name);
+    if (won) {
+        int i = MazeAddItem(m, e->item);
+        if (i < 0) {
+            MazeMessage(
+                m,
+                "You found an item but "
+                "your inventory is full."
+            );
+        } else {
+            MazeMessage(m, "You got an item");
+        }
+        m->grid[y][x]->what = none;
+        m->grid[y][x]->character = '.';
+        m->player->p.x = x;
+        m->player->p.y = y;
+    }
     return mv;
 }
 
