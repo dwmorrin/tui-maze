@@ -312,14 +312,18 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                         return 'q';
                     }
                     int won = e->hp <= 0;
+                    char *name = enemy_name(e);
                     sprintf(
                         msg,
-                        "Enemy! you roll %d, they roll %d, you %s",
+                        "%s! you roll %d, they roll %d, they have %d health, you %s",
+                        name,
                         defend,
                         attack,
+                        e->hp,
                         won ? "won" : "do some damage"
                     );
                     MazeMessage(m, msg);
+                    free(name);
                     if (won) {
                         int i = MazeAddItem(m, e->item);
                         if (i < 0) {

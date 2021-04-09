@@ -23,5 +23,6 @@ struct enemy {
 };
 
 struct enemy *new_enemy(int character);
+char* enemy_name(struct enemy*);
 
 #endif

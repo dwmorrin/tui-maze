@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "enemy.h"
 #include "items.h"
@@ -15,4 +16,19 @@ struct enemy *new_enemy(int character) {
     e->p.x = 0;
     e->p.y = 0;
     return e;
+}
+
+char *enemy_name(struct enemy *e) {
+    char *name = calloc(80, sizeof(char));
+    switch (e->character) {
+        case BIG_MOBLIN:
+            strcpy(name, "big moblin");
+            return name;
+        case MOBLIN:
+            strcpy(name, "moblin");
+            return name;
+        default:
+            strcpy(name, "mysterious figure");
+            return name;
+    }
 }
