@@ -9,5 +9,7 @@ enum items {
     food
 };
 
+char *items_name(enum items);
+
 #endif
 

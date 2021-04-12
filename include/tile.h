@@ -1,6 +1,8 @@
 #ifndef TILE
 #define TILE
 
+#include "items.h"
+
 #define PLAYER_CHAR '@'
 
 enum TileType {
@@ -21,6 +23,7 @@ struct tile {
     enum TileType type;
     int character;
     enum Stuff what;
+    enum items item;
     struct enemy *enemy_ref;
 };
 

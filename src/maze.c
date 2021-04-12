@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "fatal.h"
+#include "items.h"
 #include "maze.h"
 #include "point.h"
 #include "tile.h"
@@ -189,6 +190,8 @@ struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c)
 struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum Stuff s) {
     MazeSetTile(m, p, t, c);
     m->grid[p.y][p.x]->what = s;
+    if (s == item)
+        m->grid[p.y][p.x]->item = sword;
     return m;
 }
 
@@ -217,7 +220,6 @@ void MazeStats(struct maze* m) {
     );
     TuiPrintLineN(p.y, stats);
 }
-
 
 // returns index of item or -1 if inventory full
 int MazeAddItem(struct maze *m, enum items it) {
@@ -285,7 +287,8 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                 case item: {
                     m->player->p.x = x;
                     m->player->p.y = y;
-                    int i = MazeAddItem(m, sword);
+                    enum items itm = m->grid[y][x]->item;
+                    int i = MazeAddItem(m, itm);
                     if (i < 0) {
                         MazeMessage(
                             m,
@@ -293,9 +296,11 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                             "your inventory is full."
                         );
                     } else {
-                        MazePlayerItemEffect(m, sword);
+                        MazePlayerItemEffect(m, itm);
                         m->grid[y][x]->what = none;
-                        MazeMessage(m, "You got an item");
+                        char name[80];
+                        sprintf(name, "You found %s", items_name(itm));
+                        MazeMessage(m, name);
                     }
                     break;
                 }
@@ -335,11 +340,11 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
     char *name = enemy_name(e);
     sprintf(
         msg,
-        "%s! you roll %d, they roll %d, they have %d health, you %s",
+        "%s(%d)! you roll %d, they roll %d, you %s",
         name,
+        e->hp,
         defend,
         attack,
-        e->hp,
         won ? "won" : "do some damage"
     );
     MazeMessage(m, msg);
