@@ -13,11 +13,11 @@ int roll_die(int sides) {
     return (rand() % sides) + 1;
 }
 
-enum item_type *new_inventory() {
-    enum item_type *inv = malloc(sizeof(enum item_type) * INVENTORY_SIZE);
+struct item **new_inventory() {
+    struct item **inv = malloc(sizeof(struct item*) * INVENTORY_SIZE);
     if (!inv) fatal("no memory for a new inventory");
     for (int i = 0; i < INVENTORY_SIZE; ++i)
-        inv[i] = noitem;
+        inv[i] = new_item(noitem, 0, ' ');
     return inv;
 }
 
@@ -106,7 +106,7 @@ void MazeReadMap(struct maze* m, FILE* f) {
         c = fgetc(f);
         switch (c) {
             case '$':
-                MazeSetTileWhat(m,p,floor,'.',coins);
+                MazeSetTileCoins(m,p);
                 break;
             case MOBLIN:
             case BIG_MOBLIN:
@@ -120,84 +120,90 @@ void MazeReadMap(struct maze* m, FILE* f) {
                 MazeSetTileEnemy(m,p,floor,m->enemies[m->nextEnemy]);
                 ++m->nextEnemy;
                 break;
-            case '?':
-                MazeSetTileWhat(m,p,floor,'.',item);
-                break;
-            case '-':
-            case '|':
-                MazeSetTile(m, p, wall, c);
-                break;
-            case '/':
-                MazeSetTile(m, p, false_wall, '|');
-                break;
-            case '_':
-                MazeSetTile(m, p, false_wall, '-');
-                break;
-            case '\n':
-                p.x = -1;
-                ++p.y;
-                break;
-            case PLAYER_CHAR:
-                MazeSetPlayer(m, p);
-                MazeSetTile(m, p, floor, '.');
-                break;
-            default:
-                MazeSetTile(m, p, floor, '.');
-        }
-        ++p.x;
-    } while (c != EOF && p.y < m->rows);
-}
-
-void MazePrintInventory(struct maze* m) {
-    struct point p = {0, m->rows +1};
-    for (int i = 0; i < INVENTORY_SIZE; ++i) {
-        TuiPrint(p, '|');
-        ++p.x;
-        TuiPrint(p, items_token(m->inventory[i]));
-        ++p.x;
+            case '?': {
+                struct item *anItem = new_item(sword, 3, '/');
+                    MazeSetTileItem(m,p,anItem);
+                    break;
+                }
+                case '-':
+                case '|':
+                    MazeSetTile(m, p, wall, c);
+                    break;
+                case '/':
+                    MazeSetTile(m, p, false_wall, '|');
+                    break;
+                case '_':
+                    MazeSetTile(m, p, false_wall, '-');
+                    break;
+                case '\n':
+                    p.x = -1;
+                    ++p.y;
+                    break;
+                case PLAYER_CHAR:
+                    MazeSetPlayer(m, p);
+                    MazeSetTile(m, p, floor, '.');
+                    break;
+                default:
+                    MazeSetTile(m, p, floor, '.');
+            }
+            ++p.x;
+        } while (c != EOF && p.y < m->rows);
     }
-    TuiPrint(p, '|');
-}
 
-void MazePrintMap(struct maze* m) {
-    struct point p = {0,0};
-    for (; p.y < m->rows; ++p.y)
-        for (p.x = 0; p.x < m->columns; ++p.x)
-            TuiPrint(
-                    p,
-                    p.x == m->player->p.x &&
-                    p.y == m->player->p.y
-                      ? PLAYER_CHAR
-                      : m->grid[p.y][p.x]->character);
-    MazePrintInventory(m);
-    MazeStats(m);
-}
+    void MazePrintInventory(struct maze* m) {
+        struct point p = {0, m->rows +1};
+        for (int i = 0; i < INVENTORY_SIZE; ++i) {
+            TuiPrint(p, '|');
+            ++p.x;
+            TuiPrint(p, m->inventory[i]->character);
+            ++p.x;
+        }
+        TuiPrint(p, '|');
+    }
 
-struct maze* MazeSetPlayer(struct maze* m, struct point p) {
-    m->player->p.x = p.x;
-    m->player->p.y = p.y;
+    void MazePrintMap(struct maze* m) {
+        struct point p = {0,0};
+        for (; p.y < m->rows; ++p.y)
+            for (p.x = 0; p.x < m->columns; ++p.x)
+                TuiPrint(
+                        p,
+                        p.x == m->player->p.x &&
+                        p.y == m->player->p.y
+                          ? PLAYER_CHAR
+                          : tile_character(m->grid[p.y][p.x]));
+        MazePrintInventory(m);
+        MazeStats(m);
+    }
+
+    struct maze* MazeSetPlayer(struct maze* m, struct point p) {
+        m->player->p.x = p.x;
+        m->player->p.y = p.y;
+        return m;
+    }
+
+    struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c) {
+        if (p.y > m->rows) fatal("set point rows out of bounds");
+        if (p.x > m->columns) fatal("set point columns out of bounds");
+        m->grid[p.y][p.x]->type = t;
+        m->grid[p.y][p.x]->character = c;
+        return m;
+    }
+
+    struct maze* MazeSetTileCoins(struct maze* m, struct point p) {
+        MazeSetTile(m, p, floor, '.');
+        m->grid[p.y][p.x]->what = coins;
+        return m;
+    }
+
+    struct maze* MazeSetTileItem(struct maze* m, struct point p, struct item* i) {
+        MazeSetTile(m, p, floor, '.');
+        m->grid[p.y][p.x]->what = item;
+        m->grid[p.y][p.x]->item_ref = i;
     return m;
 }
-
-struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c) {
-    if (p.y > m->rows) fatal("set point rows out of bounds");
-    if (p.x > m->columns) fatal("set point columns out of bounds");
-    m->grid[p.y][p.x]->type = t;
-    m->grid[p.y][p.x]->character = c;
-    return m;
-}
-
-struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum tile_what w) {
-    MazeSetTile(m, p, t, c);
-    m->grid[p.y][p.x]->what = w;
-    // TODO needs another parameter to set item
-    if (w == item)
-        m->grid[p.y][p.x]->item = sword;
-    return m;
-}
-
+//TODO type should not be passed, just hardcode as actor
 struct maze* MazeSetTileEnemy(struct maze* m, struct point p, enum TileType t, struct actor *e) {
-    MazeSetTile(m, p, t, e->character);
+        MazeSetTile(m, p, floor, '.');
     m->grid[p.y][p.x]->what = actor;
     m->grid[p.y][p.x]->actor_ref = e;
     return m;
@@ -223,9 +229,9 @@ void MazeStats(struct maze* m) {
 }
 
 // returns index of item or -1 if inventory full
-int MazeAddItem(struct maze *m, enum item_type it) {
+int MazeAddItem(struct maze *m, struct item* it) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
-        if (m->inventory[i] == noitem) {
+        if (m->inventory[i]->type == noitem) {
             m->inventory[i] = it;
             MazePrintInventory(m);
             return i;
@@ -234,10 +240,10 @@ int MazeAddItem(struct maze *m, enum item_type it) {
     return -1;
 }
 
-void MazePlayerItemEffect(struct maze *m, enum item_type it) {
-    switch (it) {
+void MazePlayerItemEffect(struct maze *m, struct item *it) {
+    switch (it->type) {
         case sword:
-            m->player->attack += 3;
+            m->player->attack += it->value;
             break;
         default:
             break;
@@ -288,7 +294,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                 case item: {
                     m->player->p.x = x;
                     m->player->p.y = y;
-                    enum item_type itm = m->grid[y][x]->item;
+                    struct item *itm = m->grid[y][x]->item_ref;
                     int i = MazeAddItem(m, itm);
                     if (i < 0) {
                         MazeMessage(
@@ -300,7 +306,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                         MazePlayerItemEffect(m, itm);
                         m->grid[y][x]->what = none;
                         char name[80];
-                        sprintf(name, "You found %s", item_name(itm));
+                        sprintf(name, "You found an item: %s", item_name(itm));
                         MazeMessage(m, name);
                     }
                     break;
@@ -349,7 +355,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
     );
     MazeMessage(m, msg);
     if (won) {
-        int i = MazeAddItem(m, e->item);
+        int i = MazeAddItem(m, e->weapon);
         if (i < 0) {
             MazeMessage(
                 m,
@@ -367,29 +373,14 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
     return mv;
 }
 
-int items_token(enum item_type i) {
-    switch (i) {
-        case noitem:
-            return ' ';
-        case sword:
-            return '/';
-        case shield:
-            return '0';
-        case armor:
-            return 'T';
-        case food:
-            return '*';
-    }
-}
-
 int MazePlayerEat(struct maze *m, int mv) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
-        if (m->inventory[i] == food) {
+        if (m->inventory[i]->type == food) {
             if (m->player->hp >= 10) {
                 MazeMessage(m, "you are not hungry");
                 return mv;
             }
-            m->inventory[i] = noitem;
+            m->inventory[i]->type = noitem;
             m->player->hp += 1;
             MazePrintMap(m);
             MazeMessage(m, "yum");

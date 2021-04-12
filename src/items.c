@@ -17,8 +17,8 @@ struct item *new_item(
 
 void delete_item(struct item *i) { free(i); }
 
-char *item_name(enum item_type it) {
-    switch (it) {
+char *item_name(struct item *it) {
+    switch (it->type) {
         case sword:
             return "sword";
         case food:

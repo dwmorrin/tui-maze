@@ -18,7 +18,8 @@ struct actor {
     int damage;
     int defense;
     int coins;
-    enum item_type item;
+    struct item *weapon;
+    struct item *food;
     struct point p;
 };
 

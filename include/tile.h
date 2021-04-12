@@ -24,11 +24,12 @@ struct tile {
     enum TileType type;
     int character;
     enum tile_what what;
-    enum item_type item;
+    struct item *item_ref;
     struct actor *actor_ref;
 };
 
 void delete_tile(struct tile*);
 struct tile* new_tile();
+int tile_character(struct tile*);
 
 #endif

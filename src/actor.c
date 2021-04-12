@@ -12,7 +12,8 @@ struct actor *new_actor(int character) {
     a->damage = 0;
     a->defense = 1;
     a->coins = 0;
-    a->item = food;
+    a->weapon = new_item(sword, 1, '/');
+    a->food = new_item(food, 2, '*');
     a->p.x = 0;
     a->p.y = 0;
     return a;
