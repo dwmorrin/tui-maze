@@ -24,7 +24,7 @@ struct tile {
     enum TileType type;
     int character;
     enum tile_what what;
-    enum items item;
+    enum item_type item;
     struct actor *actor_ref;
 };
 

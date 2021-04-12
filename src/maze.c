@@ -13,8 +13,8 @@ int roll_die(int sides) {
     return (rand() % sides) + 1;
 }
 
-enum items *new_inventory() {
-    enum items *inv = malloc(sizeof(enum items) * INVENTORY_SIZE);
+enum item_type *new_inventory() {
+    enum item_type *inv = malloc(sizeof(enum item_type) * INVENTORY_SIZE);
     if (!inv) fatal("no memory for a new inventory");
     for (int i = 0; i < INVENTORY_SIZE; ++i)
         inv[i] = noitem;
@@ -223,7 +223,7 @@ void MazeStats(struct maze* m) {
 }
 
 // returns index of item or -1 if inventory full
-int MazeAddItem(struct maze *m, enum items it) {
+int MazeAddItem(struct maze *m, enum item_type it) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (m->inventory[i] == noitem) {
             m->inventory[i] = it;
@@ -234,7 +234,7 @@ int MazeAddItem(struct maze *m, enum items it) {
     return -1;
 }
 
-void MazePlayerItemEffect(struct maze *m, enum items it) {
+void MazePlayerItemEffect(struct maze *m, enum item_type it) {
     switch (it) {
         case sword:
             m->player->attack += 3;
@@ -288,7 +288,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                 case item: {
                     m->player->p.x = x;
                     m->player->p.y = y;
-                    enum items itm = m->grid[y][x]->item;
+                    enum item_type itm = m->grid[y][x]->item;
                     int i = MazeAddItem(m, itm);
                     if (i < 0) {
                         MazeMessage(
@@ -300,7 +300,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                         MazePlayerItemEffect(m, itm);
                         m->grid[y][x]->what = none;
                         char name[80];
-                        sprintf(name, "You found %s", items_name(itm));
+                        sprintf(name, "You found %s", item_name(itm));
                         MazeMessage(m, name);
                     }
                     break;
@@ -367,7 +367,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
     return mv;
 }
 
-int items_token(enum items i) {
+int items_token(enum item_type i) {
     switch (i) {
         case noitem:
             return ' ';

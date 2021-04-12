@@ -1,7 +1,7 @@
 #ifndef ITEMS
 #define ITEMS
 
-enum items {
+enum item_type {
     noitem,
     sword,
     shield,
@@ -9,7 +9,7 @@ enum items {
     food
 };
 
-char *items_name(enum items);
+char *item_name(enum item_type);
 
 #endif
 

@@ -29,7 +29,7 @@ struct maze {
     struct actor *player;
     int coins;
     int nextEnemy;
-    enum items *inventory;
+    enum item_type *inventory;
     struct actor **enemies;
     struct tile ***grid;
 };
@@ -47,7 +47,7 @@ struct maze* MazeSetTileWhat(struct maze*, struct point, enum TileType, int, enu
 struct maze* MazeSetTileEnemy(struct maze*, struct point, enum TileType, struct actor*);
 struct maze* MazeSetPlayer(struct maze*, struct point);
 int MazeMovePlayer(struct maze*, enum move);
-int items_token(enum items);
+int items_token(enum item_type);
 void MazeStats(struct maze* m);
 int MazePlayerEat(struct maze *, int);
 int MazeBattle(struct maze *, int, int, int);

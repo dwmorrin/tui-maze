@@ -3,7 +3,7 @@
 
 #include "items.h"
 
-char *items_name(enum items it) {
+char *item_name(enum item_type it) {
     switch (it) {
         case sword:
             return "sword";

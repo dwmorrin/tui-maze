@@ -18,7 +18,7 @@ struct actor {
     int damage;
     int defense;
     int coins;
-    enum items item;
+    enum item_type item;
     struct point p;
 };
 
