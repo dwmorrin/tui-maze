@@ -7,7 +7,7 @@
 #include "point.h"
 #include "tile.h"
 #include "tui.h"
-#include "enemy.h"
+#include "actor.h"
 
 int roll_die(int sides) {
     return (rand() % sides) + 1;
@@ -36,10 +36,10 @@ struct tile ***new_grid(struct maze *m) {
     return g;
 }
 
-struct enemy **new_enemies() {
-    struct enemy **e = malloc(ENEMIES_SIZE * sizeof(struct enemy*));
+struct actor **new_enemies() {
+    struct actor **e = malloc(ENEMIES_SIZE * sizeof(struct actor*));
     for (int i = 0; i < ENEMIES_SIZE; ++i) {
-        e[i] = new_enemy('!');
+        e[i] = new_actor('!');
     }
     return e;
 }
@@ -48,14 +48,14 @@ struct maze* new_maze(const char* filename) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
 
-    // enemy list
+    // actor list
     m->nextEnemy = 0;
     m->enemies = new_enemies();
 
     // inventory
     m->inventory = new_inventory();
 
-    m->player = new_enemy('@');
+    m->player = new_actor('@');
 
     // read file once to get dimensions
     FILE *f = fopen(filename, "r");
@@ -116,7 +116,7 @@ void MazeReadMap(struct maze* m, FILE* f) {
             case BIG_BAT:
                 //TODO refactor into an ``enemy push'' fn
                 if (m->nextEnemy == ENEMIES_SIZE) exit(EXIT_FAILURE);
-                m->enemies[m->nextEnemy] = new_enemy(c);
+                m->enemies[m->nextEnemy] = new_actor(c);
                 MazeSetTileEnemy(m,p,floor,m->enemies[m->nextEnemy]);
                 ++m->nextEnemy;
                 break;
@@ -187,18 +187,19 @@ struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c)
     return m;
 }
 
-struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum Stuff s) {
+struct maze* MazeSetTileWhat(struct maze* m, struct point p, enum TileType t, int c, enum tile_what w) {
     MazeSetTile(m, p, t, c);
-    m->grid[p.y][p.x]->what = s;
-    if (s == item)
+    m->grid[p.y][p.x]->what = w;
+    // TODO needs another parameter to set item
+    if (w == item)
         m->grid[p.y][p.x]->item = sword;
     return m;
 }
 
-struct maze* MazeSetTileEnemy(struct maze* m, struct point p, enum TileType t, struct enemy *e) {
+struct maze* MazeSetTileEnemy(struct maze* m, struct point p, enum TileType t, struct actor *e) {
     MazeSetTile(m, p, t, e->character);
-    m->grid[p.y][p.x]->what = enemy;
-    m->grid[p.y][p.x]->enemy_ref = e;
+    m->grid[p.y][p.x]->what = actor;
+    m->grid[p.y][p.x]->actor_ref = e;
     return m;
 }
 
@@ -304,7 +305,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                     }
                     break;
                 }
-                case enemy:
+                case actor:
                     mv = MazeBattle(m, x, y, mv);
                     if (mv == 'q') return mv;
                     break;
@@ -325,7 +326,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
 }
 
 int MazeBattle(struct maze *m, int x, int y, int mv) {
-    struct enemy *e = m->grid[y][x]->enemy_ref;
+    struct actor *e = m->grid[y][x]->actor_ref;
     // roll dice; if defeated move; else stay
     char msg[80];
     int attack = roll_die(e->attack);
@@ -337,18 +338,16 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
         return 'q';
     }
     int won = e->hp <= 0;
-    char *name = enemy_name(e);
     sprintf(
         msg,
         "%s(%d)! you roll %d, they roll %d, you %s",
-        name,
+        actor_name(e),
         e->hp,
         defend,
         attack,
         won ? "won" : "do some damage"
     );
     MazeMessage(m, msg);
-    free(name);
     if (won) {
         int i = MazeAddItem(m, e->item);
         if (i < 0) {

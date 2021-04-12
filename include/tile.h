@@ -2,6 +2,7 @@
 #define TILE
 
 #include "items.h"
+#include "actor.h"
 
 #define PLAYER_CHAR '@'
 
@@ -12,19 +13,19 @@ enum TileType {
     pit
 };
 
-enum Stuff {
+enum tile_what {
     none,
     coins,
     item,
-    enemy
+    actor
 };
 
 struct tile {
     enum TileType type;
     int character;
-    enum Stuff what;
+    enum tile_what what;
     enum items item;
-    struct enemy *enemy_ref;
+    struct actor *actor_ref;
 };
 
 void delete_tile(struct tile*);

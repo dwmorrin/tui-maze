@@ -8,7 +8,7 @@ struct tile* new_tile() {
     t->character = ' ';
     t->what = none;
     t->item = noitem;
-    t->enemy_ref = NULL;
+    t->actor_ref = NULL;
     return t;
 }
 

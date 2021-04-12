@@ -1,5 +1,5 @@
-#ifndef ENEMY
-#define ENEMY
+#ifndef ACTOR
+#define ACTOR
 
 #include "items.h"
 #include "point.h"
@@ -11,7 +11,7 @@
 #define BAT 'w'
 #define BIG_BAT 'W'
 
-struct enemy {
+struct actor {
     int character;
     int hp;
     int attack;
@@ -22,7 +22,7 @@ struct enemy {
     struct point p;
 };
 
-struct enemy *new_enemy(int character);
-char* enemy_name(struct enemy*);
+struct actor *new_actor(int character);
+char* actor_name(struct actor*);
 
 #endif
