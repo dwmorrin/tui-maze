@@ -133,16 +133,32 @@ void MazePrintInventory(struct maze* m) {
     TuiPrint(p, '|');
 }
 
+int MazePlayerTileInvisible(struct maze *m, struct point p) {
+    const int d = 3;
+    const int px = m->player->p.x;
+    const int py = m->player->p.y;
+    return (
+        p.x > px + d ||
+        p.x < px - d ||
+        p.y > py + d ||
+        p.y < py - d
+    );
+}
+
 void MazePrintMap(struct maze* m) {
     struct point p = {0,0};
     for (; p.y < m->rows; ++p.y)
         for (p.x = 0; p.x < m->columns; ++p.x)
-            TuiPrint(
+            if (MazePlayerTileInvisible(m, p)) {
+                TuiPrint(p, ' ');
+            }
+            else TuiPrint(
                 p,
                 p.x == m->player->p.x &&
                 p.y == m->player->p.y
                   ? PLAYER_CHAR
-                  : tile_character(m->grid[p.y][p.x]));
+                  : tile_character(m->grid[p.y][p.x])
+            );
     MazePrintInventory(m);
     MazeStats(m);
 }
