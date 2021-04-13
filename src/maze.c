@@ -22,6 +22,13 @@ struct item **new_inventory() {
     return inv;
 }
 
+void delete_inventory(struct item **inv) {
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
+        delete_item(inv[i]);
+    }
+    free(inv);
+}
+
 struct maze* new_maze(const char* filename) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
@@ -68,11 +75,9 @@ struct maze* init_maze_dimensions(struct maze* m, FILE* f) {
 }
 
 void delete_maze(struct maze* m) {
-    // TODO free everything
-    // need to determine who "owns" everything
-    // probably need to copy/transfer ownership
     delete_grid(m->grid, m->rows, m->columns);
-
+    delete_actor(m->player);
+    delete_inventory(m->inventory);
     free(m);
 }
 
