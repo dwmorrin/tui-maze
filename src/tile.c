@@ -13,7 +13,6 @@ struct tile* new_tile() {
 }
 
 void delete_tile(struct tile* t) {
-    // TODO release item and actor refs
     free(t);
 }
 

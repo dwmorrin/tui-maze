@@ -155,7 +155,12 @@ void MazeReadMap(struct maze* m, FILE* f) {
         for (int i = 0; i < INVENTORY_SIZE; ++i) {
             TuiPrint(p, '|');
             ++p.x;
-            TuiPrint(p, m->inventory[i]->character);
+            TuiPrint(
+                p,
+                m->inventory[i]->type == noitem
+                ? ' '
+                : m->inventory[i]->character
+            );
             ++p.x;
         }
         TuiPrint(p, '|');
@@ -363,10 +368,21 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
                 "your inventory is full."
             );
         } else {
-            MazeMessage(m, "You got an item");
+            MazeMessage(m, "You got a weapon");
         }
+        TuiInput();
+        i = MazeAddItem(m, e->food);
+        if (i < 0) {
+            MazeMessage(
+                m,
+                "You found food but "
+                "your inventory is full."
+            );
+        } else {
+            MazeMessage(m, "You got food");
+        }
+        TuiInput();
         m->grid[y][x]->what = none;
-        m->grid[y][x]->character = '.';
         m->player->p.x = x;
         m->player->p.y = y;
     }
