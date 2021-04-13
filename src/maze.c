@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "grid.h"
 #include "fatal.h"
 #include "items.h"
 #include "maze.h"
@@ -19,21 +20,6 @@ struct item **new_inventory() {
     for (int i = 0; i < INVENTORY_SIZE; ++i)
         inv[i] = new_item(noitem, 0, ' ');
     return inv;
-}
-
-struct tile ***new_grid(struct maze *m) {
-    struct tile ***g = malloc(m->rows * sizeof(struct tile**));
-    if (!g) fatal("no memory for maze grid");
-    // init grid
-    for (int i = 0; i < m->rows; ++i) {
-        g[i] = malloc(m->columns * sizeof(struct tile*));
-        if (!g[i]) fatal("no memory for maze grid");
-        for (int j = 0; j < m->columns; ++j) {
-            g[i][j] = new_tile();
-            if (!g[i][j]) fatal("no memory for new tile");
-        }
-    }
-    return g;
 }
 
 struct actor **new_enemies() {
@@ -65,7 +51,7 @@ struct maze* new_maze(const char* filename) {
     if (!m->columns) fatal("map has no columns");
 
     // initialize maze internal grid
-    m->grid = new_grid(m);
+    m->grid = new_grid(m->rows, m->columns);
     if (!m->grid) fatal("no memory for maze grid");
     rewind(f);
 
@@ -95,6 +81,7 @@ struct maze* init_maze_dimensions(struct maze* m, FILE* f) {
 
 void delete_maze(struct maze* m) {
     // TODO free everything
+    delete_grid(m->grid, m->rows, m->columns);
     free(m);
 }
 
