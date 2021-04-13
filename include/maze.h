@@ -19,8 +19,6 @@ enum action {
     eat = 'e'
 };
 
-#define ENEMIES_SIZE 64
-
 #define INVENTORY_SIZE 16
 
 struct maze {
@@ -28,9 +26,7 @@ struct maze {
     int columns;
     struct actor *player;
     int coins;
-    int nextEnemy;
     struct item **inventory;
-    struct actor **enemies;
     struct tile ***grid;
 };
 

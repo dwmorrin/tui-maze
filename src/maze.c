@@ -22,21 +22,9 @@ struct item **new_inventory() {
     return inv;
 }
 
-struct actor **new_enemies() {
-    struct actor **e = malloc(ENEMIES_SIZE * sizeof(struct actor*));
-    for (int i = 0; i < ENEMIES_SIZE; ++i) {
-        e[i] = new_actor('!');
-    }
-    return e;
-}
-
 struct maze* new_maze(const char* filename) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
-
-    // actor list
-    m->nextEnemy = 0;
-    m->enemies = new_enemies();
 
     // inventory
     m->inventory = new_inventory();
@@ -81,7 +69,10 @@ struct maze* init_maze_dimensions(struct maze* m, FILE* f) {
 
 void delete_maze(struct maze* m) {
     // TODO free everything
+    // need to determine who "owns" everything
+    // probably need to copy/transfer ownership
     delete_grid(m->grid, m->rows, m->columns);
+
     free(m);
 }
 
@@ -100,38 +91,36 @@ void MazeReadMap(struct maze* m, FILE* f) {
             case GOBLIN:
             case BIG_GOBLIN:
             case BAT:
-            case BIG_BAT:
-                //TODO refactor into an ``enemy push'' fn
-                if (m->nextEnemy == ENEMIES_SIZE) exit(EXIT_FAILURE);
-                m->enemies[m->nextEnemy] = new_actor(c);
-                MazeSetTileEnemy(m,p,floor,m->enemies[m->nextEnemy]);
-                ++m->nextEnemy;
+            case BIG_BAT: {
+                struct actor *e = new_actor(c);
+                MazeSetTileEnemy(m,p,floor,e);
                 break;
+            }
             case '?': {
                 struct item *anItem = new_item(sword, 3, '/');
-                    MazeSetTileItem(m,p,anItem);
-                    break;
-                }
-                case '-':
-                case '|':
-                    MazeSetTile(m, p, wall, c);
-                    break;
-                case '/':
-                    MazeSetTile(m, p, false_wall, '|');
-                    break;
-                case '_':
-                    MazeSetTile(m, p, false_wall, '-');
-                    break;
-                case '\n':
-                    p.x = -1;
-                    ++p.y;
-                    break;
-                case PLAYER_CHAR:
-                    MazeSetPlayer(m, p);
-                    MazeSetTile(m, p, floor, '.');
-                    break;
-                default:
-                    MazeSetTile(m, p, floor, '.');
+                MazeSetTileItem(m,p,anItem);
+                break;
+            }
+            case '-':
+            case '|':
+                MazeSetTile(m, p, wall, c);
+                break;
+            case '/':
+                MazeSetTile(m, p, false_wall, '|');
+                break;
+            case '_':
+                MazeSetTile(m, p, false_wall, '-');
+                break;
+            case '\n':
+                p.x = -1;
+                ++p.y;
+                break;
+            case PLAYER_CHAR:
+                MazeSetPlayer(m, p);
+                MazeSetTile(m, p, floor, '.');
+                break;
+            default:
+                MazeSetTile(m, p, floor, '.');
             }
             ++p.x;
         } while (c != EOF && p.y < m->rows);
