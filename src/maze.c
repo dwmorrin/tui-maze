@@ -348,6 +348,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
                 "You found an item but "
                 "your inventory is full."
             );
+            // TODO transfer item to grid
         } else {
             // remove item ownership
             free(e->weapon);
@@ -370,6 +371,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
         }
         TuiInput();
         m->grid[y][x]->what = none;
+        // TODO delete actor
         m->player->p.x = x;
         m->player->p.y = y;
     }

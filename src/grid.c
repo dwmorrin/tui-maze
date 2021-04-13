@@ -23,5 +23,7 @@ void delete_grid(struct tile ***g, int rows, int columns) {
         for (int j = 0; j < columns; ++j) {
             delete_tile(g[i][j]);
         }
+        free(g[i]);
     }
+    free(g);
 }
