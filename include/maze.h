@@ -19,8 +19,6 @@ enum action {
     eat = 'e'
 };
 
-#define INVENTORY_SIZE 16
-
 struct maze {
     int rows;
     int columns;

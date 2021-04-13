@@ -3,6 +3,7 @@
 
 #include "grid.h"
 #include "fatal.h"
+#include "inventory.h"
 #include "items.h"
 #include "maze.h"
 #include "point.h"
@@ -12,21 +13,6 @@
 
 int roll_die(int sides) {
     return (rand() % sides) + 1;
-}
-
-struct item **new_inventory() {
-    struct item **inv = malloc(sizeof(struct item*) * INVENTORY_SIZE);
-    if (!inv) fatal("no memory for a new inventory");
-    for (int i = 0; i < INVENTORY_SIZE; ++i)
-        inv[i] = new_item(noitem, 0, ' ');
-    return inv;
-}
-
-void delete_inventory(struct item **inv) {
-    for (int i = 0; i < INVENTORY_SIZE; ++i) {
-        delete_item(inv[i]);
-    }
-    free(inv);
 }
 
 struct maze* new_maze(const char* filename) {
