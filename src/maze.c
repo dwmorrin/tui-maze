@@ -345,6 +345,8 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
                 "your inventory is full."
             );
         } else {
+            // remove item ownership
+            e->weapon = NULL;
             MazeMessage(m, "You got a weapon");
         }
         TuiInput();
@@ -356,6 +358,8 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
                 "your inventory is full."
             );
         } else {
+            // remove item ownership
+            e->food = NULL;
             MazeMessage(m, "You got food");
         }
         TuiInput();
