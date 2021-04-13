@@ -24,6 +24,7 @@ struct actor {
 };
 
 struct actor *new_actor(int character);
+void delete_actor(struct actor*);
 char* actor_name(struct actor*);
 
 #endif

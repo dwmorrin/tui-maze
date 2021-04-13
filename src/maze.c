@@ -221,10 +221,10 @@ int MazeAddItem(struct maze *m, struct item* it) {
     return -1;
 }
 
-void MazePlayerItemEffect(struct maze *m, struct item *it) {
-    switch (it->type) {
+void MazePlayerItemEffect(struct maze *m, int i) {
+    switch (m->inventory[i]->type) {
         case sword:
-            m->player->attack += it->value;
+            m->player->attack += m->inventory[i]->value;
             break;
         default:
             break;
@@ -275,8 +275,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                 case item: {
                     m->player->p.x = x;
                     m->player->p.y = y;
-                    struct item *itm = m->grid[y][x]->item_ref;
-                    int i = MazeAddItem(m, itm);
+                    int i = MazeAddItem(m, m->grid[y][x]->item_ref);
                     if (i < 0) {
                         MazeMessage(
                             m,
@@ -284,10 +283,12 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                             "your inventory is full."
                         );
                     } else {
-                        MazePlayerItemEffect(m, itm);
+                        // grid no longer owns item
+                        m->grid[y][x]->item_ref = NULL;
+                        MazePlayerItemEffect(m, i);
                         m->grid[y][x]->what = none;
                         char name[80];
-                        sprintf(name, "You found an item: %s", item_name(itm));
+                        sprintf(name, "You found an item: %s", item_name(m->inventory[i]));
                         MazeMessage(m, name);
                     }
                     break;

@@ -19,6 +19,12 @@ struct actor *new_actor(int character) {
     return a;
 }
 
+void delete_actor(struct actor *a) {
+    if (a->weapon) delete_item(a->weapon);
+    if (a->food) delete_item(a->food);
+    free(a);
+}
+
 char *actor_name(struct actor *a) {
     switch (a->character) {
         case BIG_MOBLIN:

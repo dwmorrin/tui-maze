@@ -13,6 +13,8 @@ struct tile* new_tile() {
 }
 
 void delete_tile(struct tile* t) {
+    if (t->item_ref) free(t->item_ref);
+    if (t->actor_ref) free(t->actor_ref);
     free(t);
 }
 

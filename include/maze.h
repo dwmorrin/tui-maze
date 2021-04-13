@@ -47,4 +47,5 @@ int MazeMovePlayer(struct maze*, enum move);
 void MazeStats(struct maze* m);
 int MazePlayerEat(struct maze *, int);
 int MazeBattle(struct maze *, int, int, int);
+void MazePlayerItemEffect(struct maze*, int);
 #endif
