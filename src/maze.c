@@ -213,7 +213,10 @@ void MazeStats(struct maze* m) {
 int MazeAddItem(struct maze *m, struct item* it) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (m->inventory[i]->type == noitem) {
-            m->inventory[i] = it;
+            // copy item
+            m->inventory[i]->type = it->type;
+            m->inventory[i]->value = it->value;
+            m->inventory[i]->character = it->character;
             MazePrintInventory(m);
             return i;
         }
@@ -284,6 +287,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                         );
                     } else {
                         // grid no longer owns item
+                        free(m->grid[y][x]->item_ref);
                         m->grid[y][x]->item_ref = NULL;
                         MazePlayerItemEffect(m, i);
                         m->grid[y][x]->what = none;
@@ -346,6 +350,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
             );
         } else {
             // remove item ownership
+            free(e->weapon);
             e->weapon = NULL;
             MazeMessage(m, "You got a weapon");
         }
@@ -359,6 +364,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
             );
         } else {
             // remove item ownership
+            free(e->food);
             e->food = NULL;
             MazeMessage(m, "You got food");
         }
