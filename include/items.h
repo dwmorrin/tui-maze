@@ -18,6 +18,7 @@ struct item {
 struct item *new_item(enum item_type t, int v, int c);
 void delete_item(struct item*);
 char *item_name(struct item*);
+void copy_item(struct item *src, struct item *dst);
 
 #endif
 

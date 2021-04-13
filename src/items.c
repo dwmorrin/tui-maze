@@ -27,3 +27,9 @@ char *item_name(struct item *it) {
             return "mysterious item";
     }
 }
+
+void copy_item(struct item *src, struct item *dst) {
+    dst->type = src->type;
+    dst->value = src->value;
+    dst->character = src->character;
+}

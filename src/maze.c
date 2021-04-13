@@ -84,7 +84,7 @@ void MazeReadMap(struct maze* m, FILE* f) {
             case BAT:
             case BIG_BAT: {
                 struct actor *e = new_actor(c);
-                MazeSetTileEnemy(m,p,floor,e);
+                MazeSetTileEnemy(m,p,e);
                 break;
             }
             case '?': {
@@ -117,65 +117,78 @@ void MazeReadMap(struct maze* m, FILE* f) {
         } while (c != EOF && p.y < m->rows);
     }
 
-    void MazePrintInventory(struct maze* m) {
-        struct point p = {0, m->rows +1};
-        for (int i = 0; i < INVENTORY_SIZE; ++i) {
-            TuiPrint(p, '|');
-            ++p.x;
+void MazePrintInventory(struct maze* m) {
+    struct point p = {0, m->rows +1};
+    for (int i = 0; i < INVENTORY_SIZE; ++i) {
+        TuiPrint(p, '|');
+        ++p.x;
+        TuiPrint(
+            p,
+            m->inventory[i]->type == noitem
+            ? ' '
+            : m->inventory[i]->character
+        );
+        ++p.x;
+    }
+    TuiPrint(p, '|');
+}
+
+void MazePrintMap(struct maze* m) {
+    struct point p = {0,0};
+    for (; p.y < m->rows; ++p.y)
+        for (p.x = 0; p.x < m->columns; ++p.x)
             TuiPrint(
                 p,
-                m->inventory[i]->type == noitem
-                ? ' '
-                : m->inventory[i]->character
-            );
-            ++p.x;
-        }
-        TuiPrint(p, '|');
-    }
+                p.x == m->player->p.x &&
+                p.y == m->player->p.y
+                  ? PLAYER_CHAR
+                  : tile_character(m->grid[p.y][p.x]));
+    MazePrintInventory(m);
+    MazeStats(m);
+}
 
-    void MazePrintMap(struct maze* m) {
-        struct point p = {0,0};
-        for (; p.y < m->rows; ++p.y)
-            for (p.x = 0; p.x < m->columns; ++p.x)
-                TuiPrint(
-                        p,
-                        p.x == m->player->p.x &&
-                        p.y == m->player->p.y
-                          ? PLAYER_CHAR
-                          : tile_character(m->grid[p.y][p.x]));
-        MazePrintInventory(m);
-        MazeStats(m);
-    }
-
-    struct maze* MazeSetPlayer(struct maze* m, struct point p) {
-        m->player->p.x = p.x;
-        m->player->p.y = p.y;
-        return m;
-    }
-
-    struct maze* MazeSetTile(struct maze* m, struct point p, enum TileType t, int c) {
-        if (p.y > m->rows) fatal("set point rows out of bounds");
-        if (p.x > m->columns) fatal("set point columns out of bounds");
-        m->grid[p.y][p.x]->type = t;
-        m->grid[p.y][p.x]->character = c;
-        return m;
-    }
-
-    struct maze* MazeSetTileCoins(struct maze* m, struct point p) {
-        MazeSetTile(m, p, floor, '.');
-        m->grid[p.y][p.x]->what = coins;
-        return m;
-    }
-
-    struct maze* MazeSetTileItem(struct maze* m, struct point p, struct item* i) {
-        MazeSetTile(m, p, floor, '.');
-        m->grid[p.y][p.x]->what = item;
-        m->grid[p.y][p.x]->item_ref = i;
+struct maze* MazeSetPlayer(struct maze* m, struct point p) {
+    m->player->p.x = p.x;
+    m->player->p.y = p.y;
     return m;
 }
-//TODO type should not be passed, just hardcode as actor
-struct maze* MazeSetTileEnemy(struct maze* m, struct point p, enum TileType t, struct actor *e) {
-        MazeSetTile(m, p, floor, '.');
+
+struct maze* MazeSetTile(
+    struct maze* m,
+    struct point p,
+    enum TileType t,
+    int c
+) {
+    if (p.y > m->rows) fatal("set point rows out of bounds");
+    if (p.x > m->columns) fatal("set point columns out of bounds");
+    m->grid[p.y][p.x]->type = t;
+    m->grid[p.y][p.x]->character = c;
+    return m;
+}
+
+struct maze* MazeSetTileCoins(struct maze* m, struct point p) {
+    MazeSetTile(m, p, floor, '.');
+    m->grid[p.y][p.x]->what = coins;
+    return m;
+}
+
+struct maze* MazeSetTileItem(
+    struct maze* m,
+    struct point p,
+    struct item* i
+) {
+    MazeSetTile(m, p, floor, '.');
+    m->grid[p.y][p.x]->what = item;
+    m->grid[p.y][p.x]->item_ref = i;
+    return m;
+}
+
+struct maze* MazeSetTileEnemy(
+    struct maze* m,
+    struct point p,
+    struct actor *e
+) {
+    MazeSetTile(m, p, floor, '.');
     m->grid[p.y][p.x]->what = actor;
     m->grid[p.y][p.x]->actor_ref = e;
     return m;
@@ -204,10 +217,7 @@ void MazeStats(struct maze* m) {
 int MazeAddItem(struct maze *m, struct item* it) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (m->inventory[i]->type == noitem) {
-            // copy item
-            m->inventory[i]->type = it->type;
-            m->inventory[i]->value = it->value;
-            m->inventory[i]->character = it->character;
+            copy_item(it, m->inventory[i]);
             MazePrintInventory(m);
             return i;
         }
@@ -311,7 +321,6 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
 int MazeBattle(struct maze *m, int x, int y, int mv) {
     struct actor *e = m->grid[y][x]->actor_ref;
     // roll dice; if defeated move; else stay
-    char msg[80];
     int attack = roll_die(e->attack);
     int defend = roll_die(m->player->attack);
     e->hp -= defend;
@@ -321,6 +330,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
         return 'q';
     }
     int won = e->hp <= 0;
+    char msg[80];
     sprintf(
         msg,
         "%s(%d)! you roll %d, they roll %d, you %s",

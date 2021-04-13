@@ -4,6 +4,13 @@
 #include "inventory.h"
 #include "items.h"
 
+/**
+ * Allocates INVENTORY_SIZE new items representing a players
+ * inventory of items.
+ *
+ * Items should be copied into the inventory
+ * (i.e. don't reassign the pointers, set to noitem to remove)
+ */
 struct item **new_inventory() {
     struct item **inv = malloc(sizeof(struct item*) * INVENTORY_SIZE);
     if (!inv) fatal("no memory for a new inventory");
