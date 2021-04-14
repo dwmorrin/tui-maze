@@ -133,6 +133,9 @@ void MazePrintInventory(struct maze* m) {
     TuiPrint(p, '|');
 }
 
+/**
+ * To determine if maze tile is invisible to player
+ */
 int MazePlayerTileInvisible(struct maze *m, struct point p) {
     const int d = 3;
     const int px = m->player->p.x;
@@ -222,9 +225,10 @@ void MazeStats(struct maze* m) {
     char stats[80];
     sprintf(
         stats,
-        "Health: %d, Attack: %d",
+        "Health: %d, Attack: %d, $: %d",
         m->player->hp,
-        m->player->attack
+        m->player->attack,
+        m->player->coins
     );
     TuiPrintLineN(p.y, stats);
 }
@@ -287,6 +291,7 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
                     m->player->p.y = y;
                     break;
                 case coins:
+                    m->player->coins += roll_die(20);
                     MazeMessage(m, "You got coins");
                     m->grid[y][x]->what = none;
                     m->player->p.x = x;
@@ -387,6 +392,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
             MazeMessage(m, "You got food");
         }
         TuiInput();
+        m->player->coins += e->coins;
         m->grid[y][x]->what = none;
         // TODO delete actor
         m->player->p.x = x;
@@ -402,8 +408,8 @@ int MazePlayerEat(struct maze *m, int mv) {
                 MazeMessage(m, "you are not hungry");
                 return mv;
             }
-            m->inventory[i]->type = noitem;
-            m->player->hp += 1;
+            m->player->hp += m->inventory[i]->value;
+            clear_item(m->inventory[i]);
             MazePrintMap(m);
             MazeMessage(m, "yum");
             return mv;

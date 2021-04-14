@@ -33,3 +33,9 @@ void copy_item(struct item *src, struct item *dst) {
     dst->value = src->value;
     dst->character = src->character;
 }
+
+void clear_item(struct item *i) {
+    i->type = noitem;
+    i->value = 0;
+    i->character = ' ';
+}
