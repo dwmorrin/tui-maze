@@ -13,5 +13,6 @@ void TuiPrint(struct point, int);
 int TuiRows();
 void TuiVLine(struct point, int);
 void TuiPrintLineN(int, const char*);
+void TuiPrintLineNAndPause(int, const char*);
 
 #endif

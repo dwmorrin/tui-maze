@@ -219,6 +219,12 @@ void MazeMessage(struct maze* m, const char* s) {
     TuiPrintLineN(p.y, s);
 }
 
+void MazeMessagePause(struct maze* m, const char* s) {
+    struct point p = {0, m->rows + 2};
+    TuiHLine(p, ' ', TuiColumns());
+    TuiPrintLineNAndPause(p.y, s);
+}
+
 void MazeStats(struct maze* m) {
     struct point p = {0, m->rows + 4};
     TuiHLine(p, ' ', TuiColumns());
@@ -365,7 +371,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
     if (won) {
         int i = MazeAddItem(m, e->weapon);
         if (i < 0) {
-            MazeMessage(
+            MazeMessagePause(
                 m,
                 "You found an item but "
                 "your inventory is full."
@@ -375,12 +381,11 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
             // remove item ownership
             free(e->weapon);
             e->weapon = NULL;
-            MazeMessage(m, "You got a weapon");
+            MazeMessagePause(m, "You got a weapon");
         }
-        TuiInput();
         i = MazeAddItem(m, e->food);
         if (i < 0) {
-            MazeMessage(
+            MazeMessagePause(
                 m,
                 "You found food but "
                 "your inventory is full."
@@ -389,9 +394,8 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
             // remove item ownership
             free(e->food);
             e->food = NULL;
-            MazeMessage(m, "You got food");
+            MazeMessagePause(m, "You got food");
         }
-        TuiInput();
         m->player->coins += e->coins;
         m->grid[y][x]->what = none;
         // TODO delete actor

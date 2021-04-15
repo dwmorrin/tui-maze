@@ -26,6 +26,13 @@ void TuiPrintLineN(int n, const char *s) {
     mvprintw(n, 0, "%s", s);
 }
 
+void TuiPrintLineNAndPause(int n, const char *s) {
+    mvprintw(n, 0, "%s (press any key)", s);
+    TuiInput();
+    move(n, 0);
+    hline(' ', COLS);
+}
+
 void TuiHLine(struct point p, int c, int length) {
     move(p.y, p.x);
     hline(c, length);
