@@ -399,8 +399,7 @@ int MazeBattle(struct maze *m, int x, int y, int mv) {
         m->player->coins += e->coins;
         m->grid[y][x]->what = none;
         // TODO delete actor
-        m->player->p.x = x;
-        m->player->p.y = y;
+        // Do not move player onto defeated enemy square
     }
     return mv;
 }
