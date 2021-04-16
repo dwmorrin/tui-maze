@@ -15,15 +15,21 @@ int roll_die(int sides) {
     return (rand() % sides) + 1;
 }
 
-struct maze* new_maze(const char* filename) {
+struct maze* new_maze(int filenumber) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
-
-    // inventory
     m->inventory = new_inventory();
-
     m->player = new_actor('@');
+    MazeSetGrid(m, filenumber);
 
+    return m;
+}
+
+void MazeSetGrid(struct maze *m, int filenumber) {
+    // currently limited to single character
+    // filenames
+    char filename[10];
+    sprintf(filename, "%c.map.txt", filenumber);
     // read file once to get dimensions
     FILE *f = fopen(filename, "r");
     if (!f) fatal("could not open maze file");
@@ -39,7 +45,11 @@ struct maze* new_maze(const char* filename) {
     // read file again to get details into grid
     MazeReadMap(m, f);
     fclose(f);
-    return m;
+}
+
+void MazeSetMap(struct maze *m, int number) {
+    delete_grid(m->grid, m->rows, m->columns);
+    MazeSetGrid(m, number);
 }
 
 struct maze* init_maze_dimensions(struct maze* m, FILE* f) {
@@ -74,6 +84,10 @@ void MazeReadMap(struct maze* m, FILE* f) {
     do {
         c = fgetc(f);
         switch (c) {
+            case '0':
+            case '1':
+                MazeSetTile(m,p,stairs,c);
+                break;
             case '$':
                 MazeSetTileCoins(m,p);
                 break;
@@ -284,6 +298,9 @@ int MazeMovePlayer(struct maze* m, enum move mv) {
             break;
     }
     switch (m->grid[y][x]->type) {
+        case stairs:
+            MazeSetMap(m,m->grid[y][x]->character);
+            break;
         case false_wall:
             MazeMessage(m, "Secret passage!");
             m->player->p.x = x;

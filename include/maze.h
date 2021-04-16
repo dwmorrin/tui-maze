@@ -28,7 +28,8 @@ struct maze {
     struct tile ***grid;
 };
 
-struct maze* new_maze(const char*);
+struct maze* new_maze(int);
+void MazeSetGrid(struct maze*, int);
 void delete_maze(struct maze*);
 struct maze* init_maze_dimensions(struct maze*, FILE*);
 struct maze* init_maze_grid(struct maze*);

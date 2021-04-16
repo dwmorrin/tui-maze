@@ -8,7 +8,7 @@
 int main() {
     srand(time(NULL)); // initialize PRNG for rolling dice
     TuiInit();
-    struct maze* m = new_maze("map.txt");
+    struct maze* m = new_maze('0');
     MazePrintMap(m);
     int c = 0;
     while (c != 'q') {

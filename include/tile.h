@@ -10,7 +10,8 @@ enum TileType {
     false_wall,
     wall,
     floor,
-    pit
+    pit,
+    stairs
 };
 
 enum tile_what {
