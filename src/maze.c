@@ -109,16 +109,19 @@ void MazeReadMap(struct maze* m, struct actor *player, FILE* f) {
                 ++p.y;
                 break;
             case PLAYER_CHAR:
-                player->p.x = p.x;
-                player->p.y = p.y;
+                m->start.x = p.x;
+                m->start.y = p.y;
                 MazeSetTile(m, p, floor, '.');
                 break;
+            case '.':
+                MazeSetTile(m, p, floor, c);
+                break;
             default:
-                MazeSetTile(m, p, floor, '.');
-            }
-            ++p.x;
-        } while (c != EOF && p.y < m->rows);
-    }
+                MazeSetTile(m, p, pit, ' ');
+        }
+        ++p.x;
+    } while (c != EOF && p.y < m->rows);
+}
 
 /**
  * To determine if maze tile is invisible to player

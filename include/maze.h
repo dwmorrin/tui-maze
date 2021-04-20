@@ -12,6 +12,7 @@
 struct maze {
     int rows;
     int columns;
+    struct point start;
     struct tile ***grid;
 };
 

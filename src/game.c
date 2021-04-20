@@ -20,6 +20,8 @@ struct game* new_game(int levels_length) {
   g->inventory = new_inventory();
   g->levels = malloc(levels_length * sizeof(struct maze*));
   for (int i = 0; i < levels_length; ++i) g->levels[i] = new_maze(i, g->player);
+  g->player->p.x = g->levels[0]->start.x;
+  g->player->p.y = g->levels[0]->start.y;
   return g;
 }
 
@@ -108,7 +110,14 @@ int GamePlayerMove(struct game *g, enum move mv) {
         case stairs:
             g->level = m->grid[y][x]->character - '0';
             if (g->level < 0 || g->level >= g->levels_length) fatal("level out of bounds");
+            // return player here if they come back
+            // assumes only one way to return
+            m->start.x = x;
+            m->start.y = y;
+            // switch levels, update player position
             m = g->levels[g->level];
+            g->player->p.x = m->start.x;
+            g->player->p.y = m->start.y;
             break;
         case false_wall:
             MazeMessage(m, "Secret passage!");
@@ -158,7 +167,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             }
             break;
         case pit:
-            MazeMessage(m, "you died");
+            MazeMessage(m, "you fall into an endless void");
             g->player->p.x = x;
             g->player->p.y = y;
             return 'q';
