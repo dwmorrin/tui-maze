@@ -18,6 +18,10 @@ void TuiInit() {
     noecho();
 }
 
+void TuiClear() {
+    erase();
+}
+
 void TuiPrintCenter(const char *s) {
     mvprintw(LINES/2, COLS/2 - strlen(s)/2, "%s", s);
 }

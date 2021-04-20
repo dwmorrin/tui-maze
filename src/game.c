@@ -118,6 +118,8 @@ int GamePlayerMove(struct game *g, enum move mv) {
             m = g->levels[g->level];
             g->player->p.x = m->start.x;
             g->player->p.y = m->start.y;
+            // erase current level
+            TuiClear();
             break;
         case false_wall:
             MazeMessage(m, "Secret passage!");

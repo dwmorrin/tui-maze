@@ -3,6 +3,7 @@
 
 #include "point.h"
 
+void TuiClear();
 int TuiColumns();
 void TuiExit();
 void TuiHLine(struct point, int, int);
