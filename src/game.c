@@ -4,6 +4,7 @@
 #include "actor.h"
 #include "fatal.h"
 #include "game.h"
+#include "items.h"
 #include "inventory.h"
 #include "maze.h"
 #include "tui.h"
@@ -133,13 +134,17 @@ int GamePlayerMove(struct game *g, enum move mv) {
                     g->player->p.x = x;
                     g->player->p.y = y;
                     break;
-                case coins:
-                    g->player->coins += roll_die(20);
-                    MazeMessage(m, "You got coins");
+                case coins: {
+                    int coins_found = roll_die(20);
+                    g->player->coins += coins_found;
+                    char msg[80];
+                    sprintf(msg, "You found %d coins", coins_found);
+                    MazeMessage(m, msg);
                     m->grid[y][x]->what = none;
                     g->player->p.x = x;
                     g->player->p.y = y;
                     break;
+                }
                 case item: {
                     g->player->p.x = x;
                     g->player->p.y = y;
@@ -152,7 +157,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                         );
                     } else {
                         // grid no longer owns item
-                        free(m->grid[y][x]->item_ref);
+                        delete_item(m->grid[y][x]->item_ref);
                         m->grid[y][x]->item_ref = NULL;
                         GamePlayerItemEffect(g, i);
                         m->grid[y][x]->what = none;
