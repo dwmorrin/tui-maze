@@ -13,10 +13,18 @@ int main() {
 
     struct game* g = new_game(2);
     GamePrintLevel(g);
+    TuiPopup("MAZE (press any key)");
     int c = 0;
     while (c != 'q') {
         c = TuiInput();
         switch (c) {
+            case 'q': {
+                int response = TuiPopup("Quitting so soon? (y/n)");
+                if (response != 'y') {
+                    c = ' ';//something ignorable, not 'q'
+                }
+                break;
+            }
             case up:
             case down:
             case left:

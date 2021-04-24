@@ -66,21 +66,20 @@ int GameAddItem(struct game *g, struct item *it) {
 }
 
 int GamePlayerEat(struct game *g, int mv) {
-    struct maze *m = g->levels[g->level];
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (g->inventory[i]->type == food) {
             if (g->player->hp >= 10) {
-                MazeMessage(m, "you are not hungry");
+                TuiPopup("you are not hungry");
                 return mv;
             }
             g->player->hp += g->inventory[i]->value;
             clear_item(g->inventory[i]);
             GamePrintInventory(g);
-            MazeMessage(m, "yum");
+            TuiPopup("yum");
             return mv;
         }
     }
-    MazeMessage(m, "you have no food");
+    TuiPopup("you have no food");
     return mv;
 }
 
@@ -123,14 +122,13 @@ int GamePlayerMove(struct game *g, enum move mv) {
             TuiClear();
             break;
         case false_wall:
-            MazeMessage(m, "Secret passage!");
+            TuiPopup("Secret passage!");
             g->player->p.x = x;
             g->player->p.y = y;
             break;
         case floor:
             switch (m->grid[y][x]->what) {
                 case none:
-                    MazeMessage(m, "");
                     g->player->p.x = x;
                     g->player->p.y = y;
                     break;
@@ -139,7 +137,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                     g->player->coins += coins_found;
                     char msg[80];
                     sprintf(msg, "You found %d coins", coins_found);
-                    MazeMessage(m, msg);
+                    TuiPopup(msg);
                     m->grid[y][x]->what = none;
                     g->player->p.x = x;
                     g->player->p.y = y;
@@ -150,8 +148,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                     g->player->p.y = y;
                     int i = GameAddItem(g, m->grid[y][x]->item_ref);
                     if (i < 0) {
-                        MazeMessage(
-                            m,
+                        TuiPopup(
                             "You found an item but "
                             "your inventory is full."
                         );
@@ -163,7 +160,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                         m->grid[y][x]->what = none;
                         char name[80];
                         sprintf(name, "You found an item: %s", item_name(g->inventory[i]));
-                        MazeMessage(m, name);
+                        TuiPopup(name);
                     }
                     break;
                 }
@@ -174,13 +171,13 @@ int GamePlayerMove(struct game *g, enum move mv) {
             }
             break;
         case pit:
-            MazeMessage(m, "you fall into an endless void");
+            TuiPopup("you fall into an endless void");
             g->player->p.x = x;
             g->player->p.y = y;
             return 'q';
         case wall:
             // flash or bell
-            MazeMessage(m, "Ouch");
+            TuiPopup("Ouch (you walked into a wall)");
             break;
     }
     MazePrintMap(m, g->player);
@@ -194,7 +191,7 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
     e->hp -= defend;
     g->player->hp -= attack;
     if (g->player->hp <= 0) {
-        MazeMessage(m, "you died!");
+        TuiPopup("you died!");
         return 'q';
     }
     int won = e->hp <= 0;
@@ -208,12 +205,11 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
         attack,
         won ? "won" : "do some damage"
     );
-    MazeMessage(m, msg);
+    TuiPopup(msg);
     if (won) {
         int i = GameAddItem(g, e->weapon);
         if (i < 0) {
-            MazeMessagePause(
-                m,
+            TuiPopup(
                 "You found an item but "
                 "your inventory is full."
             );
@@ -222,12 +218,11 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
             // remove item ownership
             free(e->weapon);
             e->weapon = NULL;
-            MazeMessagePause(m, "You got a weapon");
+            TuiPopup("You got a weapon");
         }
         i = GameAddItem(g, e->food);
         if (i < 0) {
-            MazeMessagePause(
-                m,
+            TuiPopup(
                 "You found food but "
                 "your inventory is full."
             );
@@ -235,7 +230,7 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
             // remove item ownership
             free(e->food);
             e->food = NULL;
-            MazeMessagePause(m, "You got food");
+            TuiPopup("You got food");
         }
         g->player->coins += e->coins;
         m->grid[y][x]->what = none;

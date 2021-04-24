@@ -48,13 +48,24 @@ void TuiVLine(struct point p, int length) {
 }
 
 void TuiExit() {
-    TuiPrintCenter("press any key");
-    refresh();
-    getch();
     endwin();
     exit(EXIT_SUCCESS);
 }
 
 void TuiPrint(struct point p, int c) {
     mvaddch(p.y, p.x, c);
+}
+
+int TuiPopup(const char *msg) {
+    WINDOW *popup = newwin(4, COLS - 4, 2, 2);
+    wborder(popup, 0,0,0,0,0,0,0,0);
+    mvwaddstr(popup, 2, 2, msg);
+    wrefresh(popup);
+    int response = wgetch(popup);
+    werase(popup);
+    wrefresh(popup);
+    delwin(popup);
+    touchwin(stdscr);
+    refresh();
+    return response;
 }
