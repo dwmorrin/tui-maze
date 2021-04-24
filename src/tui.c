@@ -16,6 +16,16 @@ void TuiInit() {
     initscr();
     curs_set(false);
     noecho();
+    start_color();
+    init_pair(blue, COLOR_BLUE, COLOR_BLACK);
+    init_pair(red, COLOR_RED, COLOR_BLACK);
+    init_pair(yellow, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(white, COLOR_WHITE, COLOR_BLACK);
+}
+
+void TuiColor(enum color_pair c, int on) {
+    if (on) attron(COLOR_PAIR(c));
+    else attroff(COLOR_PAIR(c));
 }
 
 void TuiClear() {

@@ -3,6 +3,7 @@
 
 #include "items.h"
 #include "actor.h"
+#include "tui.h"
 
 #define PLAYER_CHAR '@'
 
@@ -32,5 +33,6 @@ struct tile {
 void delete_tile(struct tile*);
 struct tile* new_tile();
 int tile_character(struct tile*);
+enum color_pair tile_color(struct tile*);
 
 #endif

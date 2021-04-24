@@ -144,14 +144,18 @@ void MazePrintMap(struct maze *m, struct actor *player) {
         for (p.x = 0; p.x < m->columns; ++p.x)
             if (MazePlayerTileInvisible(m, player, p)) {
                 TuiPrint(p, ' ');
-            }
-            else TuiPrint(
-                p,
+            } else if (
                 p.x == player->p.x &&
                 p.y == player->p.y
-                  ? PLAYER_CHAR
-                  : tile_character(m->grid[p.y][p.x])
-            );
+            ) {
+                TuiPrint(p, PLAYER_CHAR);
+            } else {
+                struct tile *t = m->grid[p.y][p.x];
+                enum color_pair c = tile_color(t);
+                TuiColor(c, 1);
+                TuiPrint(p, tile_character(t));
+                TuiColor(c, 0);
+            }
     MazeStats(m, player);
 }
 

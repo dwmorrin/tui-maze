@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "tile.h"
+#include "tui.h"
 
 struct tile* new_tile() {
     struct tile* t = malloc(sizeof(struct tile));
@@ -28,5 +29,18 @@ int tile_character(struct tile *t) {
             return t->item_ref->character;
         case actor:
             return t->actor_ref->character;
+    }
+}
+
+enum color_pair tile_color(struct tile *t) {
+    switch (t->what) {
+        case none:
+            return white;
+        case coins:
+            return yellow;
+        case item:
+            return red;
+        case actor:
+            return blue;
     }
 }

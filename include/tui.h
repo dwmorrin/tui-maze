@@ -3,6 +3,14 @@
 
 #include "point.h"
 
+enum color_pair {
+    blue = 1,
+    red,
+    yellow,
+    white
+};
+
+void TuiColor(enum color_pair,int);
 void TuiClear();
 int TuiColumns();
 void TuiExit();
