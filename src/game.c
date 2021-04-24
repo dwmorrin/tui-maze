@@ -83,7 +83,7 @@ int GamePlayerEat(struct game *g, int mv) {
     return mv;
 }
 
-// return 'q' to kill game
+// return quit to kill game
 int GamePlayerMove(struct game *g, enum move mv) {
     int x = g->player->p.x;
     int y = g->player->p.y;
@@ -166,7 +166,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                 }
                 case actor:
                     mv = GameBattle(g, m, x, y, mv);
-                    if (mv == 'q') return mv;
+                    if (mv == quit) return mv;
                     break;
             }
             break;
@@ -174,7 +174,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             TuiPopup("you fall into an endless void");
             g->player->p.x = x;
             g->player->p.y = y;
-            return 'q';
+            return quit;
         case wall:
             // flash or bell
             TuiPopup("Ouch (you walked into a wall)");
@@ -192,7 +192,7 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
     g->player->hp -= attack;
     if (g->player->hp <= 0) {
         TuiPopup("you died!");
-        return 'q';
+        return quit;
     }
     int won = e->hp <= 0;
     char msg[80];
@@ -248,3 +248,10 @@ void GamePlayerItemEffect(struct game *g, int i) {
             break;
     }
 }
+
+void GameReset(struct game *g) {
+    delete_game(g);
+    g = new_game(2);
+    GamePrintLevel(g);
+}
+

@@ -14,14 +14,14 @@ int main() {
     struct game* g = new_game(2);
     GamePrintLevel(g);
     TuiPopup("MAZE (press any key)");
-    int c = 0;
-    while (c != 'q') {
+    int c = ignore;
+    while (c != quit) {
         c = TuiInput();
         switch (c) {
-            case 'q': {
+            case quit: {
                 int response = TuiPopup("Quitting so soon? (y/n)");
                 if (response != 'y') {
-                    c = ' ';//something ignorable, not 'q'
+                    c = ignore;
                 }
                 break;
             }
@@ -30,6 +30,10 @@ int main() {
             case left:
             case right:
                 c = GamePlayerMove(g, c);
+                if (c == quit) {
+                    c = ignore;
+                    GameReset(g);
+                }
                 break;
             case eat:
                 c = GamePlayerEat(g, c);
