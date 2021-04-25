@@ -12,15 +12,15 @@
 #include "tile.h"
 #include "tui.h"
 
-struct maze* new_maze(int filenumber, struct actor *player) {
+struct maze* new_maze(int filenumber) {
     struct maze *m = malloc(sizeof(struct maze));
     if (!m) fatal("no memory for a new maze");
-    MazeSetGrid(m, filenumber, player);
+    MazeSetGrid(m, filenumber);
 
     return m;
 }
 
-void MazeSetGrid(struct maze *m, int filenumber, struct actor *player) {
+void MazeSetGrid(struct maze *m, int filenumber) {
     // currently limited to single character
     // filenames
     char filename[10];
@@ -38,7 +38,7 @@ void MazeSetGrid(struct maze *m, int filenumber, struct actor *player) {
     rewind(f);
 
     // read file again to get details into grid
-    MazeReadMap(m, player, f);
+    MazeReadMap(m, f);
     fclose(f);
 }
 
@@ -66,7 +66,7 @@ void delete_maze(struct maze* m) {
 }
 
 // Reads the characters into the maze grid 2D array
-void MazeReadMap(struct maze* m, struct actor *player, FILE* f) {
+void MazeReadMap(struct maze* m, FILE* f) {
     int c;
     struct point p = {0,0};
     do {

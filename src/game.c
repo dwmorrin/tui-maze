@@ -20,7 +20,7 @@ struct game* new_game(int levels_length) {
   g->player = new_actor('@');
   g->inventory = new_inventory();
   g->levels = malloc(levels_length * sizeof(struct maze*));
-  for (int i = 0; i < levels_length; ++i) g->levels[i] = new_maze(i, g->player);
+  for (int i = 0; i < levels_length; ++i) g->levels[i] = new_maze(i);
   g->player->p.x = g->levels[0]->start.x;
   g->player->p.y = g->levels[0]->start.y;
   return g;
