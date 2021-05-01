@@ -107,7 +107,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             break;
     }
     switch (m->grid[y][x]->type) {
-        case stairs:
+        case stairs: {
             g->level = m->grid[y][x]->character - '0';
             if (g->level < 0 || g->level >= g->levels_length) fatal("level out of bounds");
             // return player here if they come back
@@ -120,7 +120,11 @@ int GamePlayerMove(struct game *g, enum move mv) {
             g->player->p.y = m->start.y;
             // erase current level
             TuiClear();
+            char msg[80];
+            sprintf(msg, "You take the stairs to level %d", g->level);
+            TuiPopup(msg);
             break;
+        }
         case false_wall:
             TuiPopup("Secret passage!");
             g->player->p.x = x;

@@ -30,6 +30,7 @@ void TuiColor(enum color_pair c, int on) {
 
 void TuiClear() {
     erase();
+    refresh();
 }
 
 void TuiPrintCenter(const char *s) {
