@@ -48,5 +48,6 @@ void GameReset(struct game*);
 void GameModeSet(struct game*, enum GameMode);
 void GameInventorySelect(struct game*, enum move);
 void GamePlayerUseItem(struct game*);
+void GamePrintStats(struct game*);
 
 #endif

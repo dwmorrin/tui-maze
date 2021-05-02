@@ -23,6 +23,10 @@ char *item_name(struct item *it) {
             return "sword";
         case food:
             return "food";
+        case shield:
+            return "shield";
+        case armor:
+            return "armor";
         default:
             return "mysterious item";
     }

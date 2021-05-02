@@ -29,5 +29,4 @@ struct maze* MazeSetTile(struct maze*, struct point, enum TileType, int);
 struct maze* MazeSetTileEnemy(struct maze*, struct point, struct actor*);
 struct maze* MazeSetTileCoins(struct maze* m, struct point p);
 struct maze* MazeSetTileItem(struct maze* m, struct point p, struct item* i);
-void MazeStats(struct maze* m, struct actor*);
 #endif

@@ -94,6 +94,16 @@ void MazeReadMap(struct maze* m, FILE* f) {
                 MazeSetTileItem(m,p,anItem);
                 break;
             }
+            case 'O': {
+                struct item *anItem = new_item(shield, 3, c);
+                MazeSetTileItem(m,p,anItem);
+                break;
+            }
+            case 'A': {
+                struct item *anItem = new_item(armor, 3, c);
+                MazeSetTileItem(m,p,anItem);
+                break;
+            }
             case '-':
             case '|':
                 MazeSetTile(m, p, wall, c);
@@ -156,7 +166,6 @@ void MazePrintMap(struct maze *m, struct actor *player) {
                 TuiPrint(p, tile_character(t));
                 TuiColor(c, 0);
             }
-    MazeStats(m, player);
 }
 
 struct maze* MazeSetTile(
@@ -212,16 +221,3 @@ void MazeMessagePause(struct maze* m, const char* s) {
     TuiPrintLineNAndPause(p.y, s);
 }
 
-void MazeStats(struct maze* m, struct actor *player) {
-    struct point p = {0, m->rows + 4};
-    TuiHLine(p, ' ', TuiColumns());
-    char stats[80];
-    sprintf(
-        stats,
-        "Health: %d, Attack: %d, $: %d",
-        player->hp,
-        player->attack,
-        player->coins
-    );
-    TuiPrintLineN(p.y, stats);
-}

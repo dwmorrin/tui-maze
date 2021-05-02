@@ -37,6 +37,8 @@ void delete_game(struct game *g) {
 
 void GamePrintLevel(struct game *g) {
   MazePrintMap(g->levels[g->level], g->player);
+  GamePrintStats(g);
+  GamePrintInventory(g);
 }
 
 void GamePrintInventory(struct game* g) {
@@ -197,7 +199,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             TuiPopup("Ouch (you walked into a wall)");
             break;
     }
-    MazePrintMap(m, g->player);
+    GamePrintLevel(g);
     return mv;
 }
 
@@ -297,15 +299,33 @@ void GamePlayerUseItem(struct game *g) {
         case sword:
             g->player->attack += i->value;
             clear_item(g->inventory[g->inventory_index]);
-            GamePrintInventory(g);
             TuiPopup("your attack is increased");
             break;
-        case shield:
-            break;
         case armor:
+        case shield:
+            g->player->defense += i->value;
+            clear_item(g->inventory[g->inventory_index]);
+            TuiPopup("your defense is increased");
             break;
         case food:
             GamePlayerEat(g);
             break;
     }
+    GamePrintLevel(g);
+}
+
+void GamePrintStats(struct game *g) {
+    struct maze *m = g->levels[g->level];
+    struct point p = {0, m->rows + 4};
+    TuiHLine(p, ' ', TuiColumns());
+    char stats[80];
+    sprintf(
+        stats,
+        "Health: %d, Attack: %d, Defense: %d, $: %d",
+        g->player->hp,
+        g->player->attack,
+        g->player->defense,
+        g->player->coins
+    );
+    TuiPrintLineN(p.y, stats);
 }
