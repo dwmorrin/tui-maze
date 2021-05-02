@@ -40,10 +40,9 @@ void delete_game(struct game*);
 
 void GamePrintLevel(struct game*);
 void GamePrintInventory(struct game*);
-int GamePlayerEat(struct game*, int mv);
+void GamePlayerEat(struct game*);
 int GamePlayerMove(struct game*, enum move);
 int GameBattle(struct game*, struct maze*, int x, int y, int mv);
-void GamePlayerItemEffect(struct game*, int);
 int GameAddItem(struct game *g, struct item *it);
 void GameReset(struct game*);
 void GameModeSet(struct game*, enum GameMode);

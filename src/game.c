@@ -79,22 +79,22 @@ int GameAddItem(struct game *g, struct item *it) {
     return -1;
 }
 
-int GamePlayerEat(struct game *g, int mv) {
+void GamePlayerEat(struct game *g) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (g->inventory[i]->type == food) {
             if (g->player->hp >= 10) {
                 TuiPopup("you are not hungry");
-                return mv;
+                return;
             }
             g->player->hp += g->inventory[i]->value;
             clear_item(g->inventory[i]);
             GamePrintInventory(g);
             TuiPopup("yum");
-            return mv;
+            return;
         }
     }
     TuiPopup("you have no food");
-    return mv;
+    return;
 }
 
 // return quit to kill game
@@ -174,7 +174,6 @@ int GamePlayerMove(struct game *g, enum move mv) {
                         // grid no longer owns item
                         delete_item(m->grid[y][x]->item_ref);
                         m->grid[y][x]->item_ref = NULL;
-                        GamePlayerItemEffect(g, i);
                         m->grid[y][x]->what = none;
                         char name[80];
                         sprintf(name, "You found an item: %s", item_name(g->inventory[i]));
@@ -257,16 +256,6 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
     return mv;
 }
 
-void GamePlayerItemEffect(struct game *g, int i) {
-    switch (g->inventory[i]->type) {
-        case sword:
-            g->player->attack += g->inventory[i]->value;
-            break;
-        default:
-            break;
-    }
-}
-
 void GameReset(struct game *g) {
     delete_game(g);
     g = new_game(2);
@@ -306,13 +295,17 @@ void GamePlayerUseItem(struct game *g) {
         case noitem:
             return;
         case sword:
+            g->player->attack += i->value;
+            clear_item(g->inventory[g->inventory_index]);
+            GamePrintInventory(g);
+            TuiPopup("your attack is increased");
             break;
         case shield:
             break;
         case armor:
             break;
         case food:
-            GamePlayerEat(g, 0);
+            GamePlayerEat(g);
             break;
     }
 }
