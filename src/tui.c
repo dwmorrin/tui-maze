@@ -21,6 +21,7 @@ void TuiInit() {
     init_pair(red, COLOR_RED, COLOR_BLACK);
     init_pair(yellow, COLOR_YELLOW, COLOR_BLACK);
     init_pair(white, COLOR_WHITE, COLOR_BLACK);
+    init_pair(red_select, COLOR_WHITE, COLOR_RED);
 }
 
 void TuiColor(enum color_pair c, int on) {

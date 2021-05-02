@@ -29,14 +29,24 @@ int main() {
             case down:
             case left:
             case right:
-                c = GamePlayerMove(g, c);
-                if (c == quit) {
-                    c = ignore;
-                    GameReset(g);
+                if (g->mode == MapMode) {
+                    c = GamePlayerMove(g, c);
+                    if (c == quit) {
+                        c = ignore;
+                        GameReset(g);
+                    }
+                } else if (g->mode == InventoryMode) {
+                    GameInventorySelect(g, c);
                 }
                 break;
             case eat:
                 c = GamePlayerEat(g, c);
+                break;
+            case inventory:
+                GameModeSet(g, InventoryMode);
+                break;
+            case movement:
+                GameModeSet(g, MapMode);
                 break;
         }
     }

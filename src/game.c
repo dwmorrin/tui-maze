@@ -17,6 +17,8 @@ struct game* new_game(int levels_length) {
   struct game *g = malloc(sizeof(struct game));
   g->level = 0;
   g->levels_length = levels_length;
+  g->mode = MapMode;
+  g->inventory_index = 0;
   g->player = new_actor('@');
   g->inventory = new_inventory();
   g->levels = malloc(levels_length * sizeof(struct maze*));
@@ -42,6 +44,12 @@ void GamePrintInventory(struct game* g) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         TuiPrint(p, '|');
         ++p.x;
+        if (
+            g->mode == InventoryMode &&
+            i == g-> inventory_index
+        ) {
+            TuiColor(red_select, 1);
+        }
         TuiPrint(
             p,
             g->inventory[i]->type == noitem
@@ -49,6 +57,12 @@ void GamePrintInventory(struct game* g) {
             : g->inventory[i]->character
         );
         ++p.x;
+        if (
+            g->mode == InventoryMode &&
+            i == g-> inventory_index
+        ) {
+            TuiColor(red_select, 0);
+        }
     }
     TuiPrint(p, '|');
 }
@@ -259,3 +273,29 @@ void GameReset(struct game *g) {
     GamePrintLevel(g);
 }
 
+void GameModeSet(struct game *g, enum GameMode mode) {
+    g->mode = mode;
+    if (g->mode == InventoryMode) {
+        // turn off inventory highlight
+        GamePrintInventory(g);
+    } else {
+        // turn on inventory highlight
+        GamePrintInventory(g);
+    }
+}
+
+void GameInventorySelect(struct game *g, enum move mv) {
+    switch (mv) {
+        case left:
+            if (g->inventory_index == 0) return;
+            --g->inventory_index;
+            break;
+        case right:
+            if (g->inventory_index == INVENTORY_SIZE - 1) return;
+            ++g->inventory_index;
+            break;
+        default:
+            break;
+    }
+    GamePrintInventory(g);
+}

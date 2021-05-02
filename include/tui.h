@@ -7,7 +7,8 @@ enum color_pair {
     blue = 1,
     red,
     yellow,
-    white
+    white,
+    red_select
 };
 
 void TuiColor(enum color_pair,int);

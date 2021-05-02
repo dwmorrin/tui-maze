@@ -15,12 +15,21 @@ enum move {
 enum action {
     eat = 'e',
     quit = 'q',
-    ignore = ';'
+    ignore = ';',
+    inventory = 'i',
+    movement = 'm'
+};
+
+enum GameMode {
+    MapMode,
+    InventoryMode
 };
 
 struct game {
   int level;
   int levels_length;
+  enum GameMode mode;
+  int inventory_index;
   struct actor *player;
   struct item **inventory;
   struct maze **levels;
@@ -37,5 +46,7 @@ int GameBattle(struct game*, struct maze*, int x, int y, int mv);
 void GamePlayerItemEffect(struct game*, int);
 int GameAddItem(struct game *g, struct item *it);
 void GameReset(struct game*);
+void GameModeSet(struct game*, enum GameMode);
+void GameInventorySelect(struct game*, enum move);
 
 #endif
