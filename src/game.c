@@ -299,3 +299,20 @@ void GameInventorySelect(struct game *g, enum move mv) {
     }
     GamePrintInventory(g);
 }
+
+void GamePlayerUseItem(struct game *g) {
+    struct item *i = g->inventory[g->inventory_index];
+    switch (i->type) {
+        case noitem:
+            return;
+        case sword:
+            break;
+        case shield:
+            break;
+        case armor:
+            break;
+        case food:
+            GamePlayerEat(g, 0);
+            break;
+    }
+}

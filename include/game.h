@@ -13,11 +13,11 @@ enum move {
 };
 
 enum action {
-    eat = 'e',
     quit = 'q',
     ignore = ';',
     inventory = 'i',
-    movement = 'm'
+    movement = 'm',
+    use = 'u'
 };
 
 enum GameMode {
@@ -48,5 +48,6 @@ int GameAddItem(struct game *g, struct item *it);
 void GameReset(struct game*);
 void GameModeSet(struct game*, enum GameMode);
 void GameInventorySelect(struct game*, enum move);
+void GamePlayerUseItem(struct game*);
 
 #endif

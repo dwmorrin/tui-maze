@@ -39,8 +39,10 @@ int main() {
                     GameInventorySelect(g, c);
                 }
                 break;
-            case eat:
-                c = GamePlayerEat(g, c);
+            case use:
+                if (g->mode == InventoryMode) {
+                    GamePlayerUseItem(g);
+                }
                 break;
             case inventory:
                 GameModeSet(g, InventoryMode);
