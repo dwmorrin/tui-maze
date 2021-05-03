@@ -51,5 +51,6 @@ void GamePlayerUseItem(struct game*);
 void GamePrintStats(struct game*);
 struct maze *GameCurrentLevel(struct game*);
 int roll_die(int);
+void GamePostBattle(struct game*, struct tile*);
 
 #endif

@@ -204,6 +204,38 @@ int GamePlayerMove(struct game *g, enum move mv) {
     return mv;
 }
 
+void GamePostBattle(struct game *g, struct tile *t) {
+    struct actor *e = t->actor_ref;
+    int i = GameAddItem(g, e->weapon);
+    if (i < 0) {
+        TuiPopup(
+            "You found an item but "
+            "your inventory is full."
+        );
+        // TODO transfer item to grid
+    } else {
+        // remove item ownership
+        free(e->weapon);
+        e->weapon = NULL;
+        TuiPopup("You got a weapon");
+    }
+    i = GameAddItem(g, e->food);
+    if (i < 0) {
+        TuiPopup(
+            "You found food but "
+            "your inventory is full."
+        );
+    } else {
+        // remove item ownership
+        free(e->food);
+        e->food = NULL;
+        TuiPopup("You got food");
+    }
+    g->player->coins += e->coins;
+    t->what = none;
+    // TODO delete actor
+}
+
 int GameBattle(struct game *g, struct tile *t, int mv) {
     struct actor *e = t->actor_ref;
     int attack = roll_die(e->attack);
@@ -226,36 +258,7 @@ int GameBattle(struct game *g, struct tile *t, int mv) {
         won ? "won" : "do some damage"
     );
     TuiPopup(msg);
-    if (won) {
-        int i = GameAddItem(g, e->weapon);
-        if (i < 0) {
-            TuiPopup(
-                "You found an item but "
-                "your inventory is full."
-            );
-            // TODO transfer item to grid
-        } else {
-            // remove item ownership
-            free(e->weapon);
-            e->weapon = NULL;
-            TuiPopup("You got a weapon");
-        }
-        i = GameAddItem(g, e->food);
-        if (i < 0) {
-            TuiPopup(
-                "You found food but "
-                "your inventory is full."
-            );
-        } else {
-            // remove item ownership
-            free(e->food);
-            e->food = NULL;
-            TuiPopup("You got food");
-        }
-        g->player->coins += e->coins;
-        t->what = none;
-        // TODO delete actor
-    }
+    if (won) GamePostBattle(g, t);
     return mv;
 }
 
