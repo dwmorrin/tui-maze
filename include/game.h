@@ -42,7 +42,7 @@ void GamePrintLevel(struct game*);
 void GamePrintInventory(struct game*);
 void GamePlayerEat(struct game*);
 int GamePlayerMove(struct game*, enum move);
-int GameBattle(struct game*, struct maze*, int x, int y, int mv);
+int GameBattle(struct game*, struct tile*, int);
 int GameAddItem(struct game *g, struct item *it);
 void GameReset(struct game*);
 void GameModeSet(struct game*, enum GameMode);

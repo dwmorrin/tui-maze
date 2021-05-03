@@ -184,7 +184,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
                     break;
                 }
                 case actor:
-                    mv = GameBattle(g, m, x, y, mv);
+                    mv = GameBattle(g, m->grid[y][x], mv);
                     if (mv == quit) return mv;
                     break;
             }
@@ -204,8 +204,8 @@ int GamePlayerMove(struct game *g, enum move mv) {
     return mv;
 }
 
-int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
-    struct actor *e = m->grid[y][x]->actor_ref;
+int GameBattle(struct game *g, struct tile *t, int mv) {
+    struct actor *e = t->actor_ref;
     int attack = roll_die(e->attack);
     int defend = roll_die(g->player->attack);
     e->hp -= defend;
@@ -253,7 +253,7 @@ int GameBattle(struct game *g, struct maze *m, int x, int y, int mv) {
             TuiPopup("You got food");
         }
         g->player->coins += e->coins;
-        m->grid[y][x]->what = none;
+        t->what = none;
         // TODO delete actor
     }
     return mv;
