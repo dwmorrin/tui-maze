@@ -222,19 +222,18 @@ void MazeMessagePause(struct maze* m, const char* s) {
 }
 
 struct tile *MazeFindAdjacentEmptyFloor(struct maze *m, struct point p) {
-    for (int i = -1; i < 2; ++i) {
-        for (int j = -1; j < 2; ++j) {
-            // skip if no offset
-            if (i == 0 && j == 0) continue;
-            int yy = p.y + i;
-            int xx = p.x + j;
-            if (yy < 0 || yy > m->rows) continue;
-            if (xx < 0 || xx > m->columns) continue;
-            if (
-                TileIsEmptyFloor(m->grid[yy][xx]) &&
-                roll_die(6) > 3
-            ) return m->grid[yy][xx];
-        }
+    for (int try = 0; try < 8; ++try) {
+        int offsetX = (rand() % 3) - 1;
+        int offsetY = (rand() % 3) - 1;
+        if (!offsetX && !offsetY) continue;
+        int yy = p.y + offsetY;
+        int xx = p.x + offsetX;
+        if (yy < 0 || yy > m->rows) continue;
+        if (xx < 0 || xx > m->columns) continue;
+        if (
+            TileIsEmptyFloor(m->grid[yy][xx]) &&
+            roll_die(6) > 3
+        ) return m->grid[yy][xx];
     }
     return NULL;
 }
