@@ -11,7 +11,7 @@ struct tile ***new_grid(int rows, int columns) {
         g[i] = malloc(columns * sizeof(struct tile*));
         if (!g[i]) fatal("no memory for maze grid");
         for (int j = 0; j < columns; ++j) {
-            g[i][j] = new_tile();
+            g[i][j] = new_tile(i,j);
             if (!g[i][j]) fatal("no memory for new tile");
         }
     }

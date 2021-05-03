@@ -199,7 +199,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             TuiPopup("Ouch (you walked into a wall)");
             break;
     }
-    MazeMoveActors(GameCurrentLevel(g));
+    MazeMoveActors(GameCurrentLevel(g), g->player->p);
     GamePrintLevel(g);
     return mv;
 }

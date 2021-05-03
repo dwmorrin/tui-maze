@@ -30,5 +30,5 @@ struct maze* MazeSetTileEnemy(struct maze*, struct point, struct actor*);
 struct maze* MazeSetTileCoins(struct maze* m, struct point p);
 struct maze* MazeSetTileItem(struct maze* m, struct point p, struct item* i);
 struct tile *MazeFindAdjacentEmptyFloor(struct maze *, struct point);
-void MazeMoveActors(struct maze*);
+void MazeMoveActors(struct maze*, struct point);
 #endif

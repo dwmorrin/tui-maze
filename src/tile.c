@@ -3,8 +3,10 @@
 #include "tile.h"
 #include "tui.h"
 
-struct tile* new_tile() {
+struct tile* new_tile(int row, int column) {
     struct tile* t = malloc(sizeof(struct tile));
+    t->p.x = column;
+    t->p.y = row;
     t->type = pit;
     t->character = ' ';
     t->what = none;

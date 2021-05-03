@@ -239,7 +239,7 @@ struct tile *MazeFindAdjacentEmptyFloor(struct maze *m, struct point p) {
     return NULL;
 }
 
-void MazeMoveActors(struct maze *m) {
+void MazeMoveActors(struct maze *m, struct point player) {
     struct point p = {0,0};
     for (; p.y < m->rows; ++p.y) {
         for (p.x = 0; p.x < m->columns; ++p.x) {
@@ -248,6 +248,7 @@ void MazeMoveActors(struct maze *m) {
                 // find floor
                 struct tile *tt = MazeFindAdjacentEmptyFloor(m, p);
                 if (!tt) continue;
+                if (tt->p.x == player.x && tt->p.y == player.y) continue;
                 // switch actor from t to tt
                 tt->actor_ref = t->actor_ref;
                 tt->what = actor;
