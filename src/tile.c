@@ -44,3 +44,7 @@ enum color_pair tile_color(struct tile *t) {
             return blue;
     }
 }
+
+bool TileIsEmptyFloor(struct tile* t) {
+    return t->type == floor && t->what == none;
+}

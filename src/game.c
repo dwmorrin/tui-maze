@@ -199,6 +199,7 @@ int GamePlayerMove(struct game *g, enum move mv) {
             TuiPopup("Ouch (you walked into a wall)");
             break;
     }
+    MazeMoveActors(GameCurrentLevel(g));
     GamePrintLevel(g);
     return mv;
 }
@@ -328,4 +329,8 @@ void GamePrintStats(struct game *g) {
         g->player->coins
     );
     TuiPrintLineN(p.y, stats);
+}
+
+struct maze *GameCurrentLevel(struct game *g) {
+    return g->levels[g->level];
 }

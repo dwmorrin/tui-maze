@@ -49,5 +49,7 @@ void GameModeSet(struct game*, enum GameMode);
 void GameInventorySelect(struct game*, enum move);
 void GamePlayerUseItem(struct game*);
 void GamePrintStats(struct game*);
+struct maze *GameCurrentLevel(struct game*);
+int roll_die(int);
 
 #endif

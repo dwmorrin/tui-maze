@@ -221,3 +221,39 @@ void MazeMessagePause(struct maze* m, const char* s) {
     TuiPrintLineNAndPause(p.y, s);
 }
 
+struct tile *MazeFindAdjacentEmptyFloor(struct maze *m, struct point p) {
+    for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+            // skip if no offset
+            if (i == 0 && j == 0) continue;
+            int yy = p.y + i;
+            int xx = p.x + j;
+            if (yy < 0 || yy > m->rows) continue;
+            if (xx < 0 || xx > m->columns) continue;
+            if (
+                TileIsEmptyFloor(m->grid[yy][xx]) &&
+                roll_die(6) > 3
+            ) return m->grid[yy][xx];
+        }
+    }
+    return NULL;
+}
+
+void MazeMoveActors(struct maze *m) {
+    struct point p = {0,0};
+    for (; p.y < m->rows; ++p.y) {
+        for (p.x = 0; p.x < m->columns; ++p.x) {
+            struct tile *t = m->grid[p.y][p.x];
+            if (t->what == actor) {
+                // find floor
+                struct tile *tt = MazeFindAdjacentEmptyFloor(m, p);
+                if (!tt) continue;
+                // switch actor from t to tt
+                tt->actor_ref = t->actor_ref;
+                tt->what = actor;
+                t->what = none;
+                t->actor_ref = NULL;
+            }
+        }
+    }
+}

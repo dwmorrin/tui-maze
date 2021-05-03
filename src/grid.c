@@ -27,3 +27,4 @@ void delete_grid(struct tile ***g, int rows, int columns) {
     }
     free(g);
 }
+
