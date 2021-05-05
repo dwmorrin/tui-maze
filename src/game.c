@@ -84,11 +84,12 @@ int GameAddItem(struct game *g, struct item *it) {
 void GamePlayerEat(struct game *g) {
     for (int i = 0; i < INVENTORY_SIZE; ++i) {
         if (g->inventory[i]->type == food) {
-            if (g->player->hp >= 10) {
+            if (g->player->damage <= 0) {
                 TuiPopup("you are not hungry");
                 return;
             }
-            g->player->hp += g->inventory[i]->value;
+            g->player->damage -= g->inventory[i]->value;
+            if (g->player->damage < 0) g->player->damage = 0;
             clear_item(g->inventory[i]);
             GamePrintInventory(g);
             TuiPopup("yum");
@@ -238,23 +239,23 @@ void GamePostBattle(struct game *g, struct tile *t) {
 
 int GameBattle(struct game *g, struct tile *t, int mv) {
     struct actor *e = t->actor_ref;
-    int attack = roll_die(e->attack);
-    int defend = roll_die(g->player->attack);
-    e->hp -= defend;
-    g->player->hp -= attack;
-    if (g->player->hp <= 0) {
+    int e_attack = roll_die(e->attack);
+    int p_attack = roll_die(g->player->attack);
+    e->damage += p_attack;
+    g->player->damage += e_attack;
+    if (actor_health(g->player) <= 0) {
         TuiPopup("you died!");
         return quit;
     }
-    int won = e->hp <= 0;
+    int won = actor_health(e) <= 0;
     char msg[80];
     sprintf(
         msg,
         "%s(%d)! you roll %d, they roll %d, you %s",
         actor_name(e),
-        e->hp,
-        defend,
-        attack,
+        actor_health(e),
+        p_attack,
+        e_attack,
         won ? "won" : "do some damage"
     );
     TuiPopup(msg);
@@ -326,7 +327,7 @@ void GamePrintStats(struct game *g) {
     sprintf(
         stats,
         "Health: %d, Attack: %d, Defense: %d, $: %d",
-        g->player->hp,
+        actor_health(g->player),
         g->player->attack,
         g->player->defense,
         g->player->coins

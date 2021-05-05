@@ -35,3 +35,9 @@ char *actor_name(struct actor *a) {
             return "mysterious figure";
     }
 }
+
+int actor_health(struct actor *a) {
+    int health = a->hp - a->damage;
+    // disallows returning negative health
+    return health > 0 ? health : 0;
+}
